@@ -1,32 +1,37 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Reviews\Models;
 
-use App\Domains\Services\Models\Service;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Review extends Model implements HasMedia
+class Review extends Model
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory;
 
-    protected $fillable = ['author', 'content', 'rating', 'approved'];
-
-    protected $casts = [
-        'approved' => 'boolean',
-        'rating' => 'integer',
+    protected $fillable = [
+        'service_id',
+        'author',
+        'content',
+        'rating',
+        'approved',
     ];
 
-    public function service()
+    protected $casts = [
+        'rating' => 'integer',
+        'approved' => 'boolean',
+    ];
+
+    public function service(): BelongsTo
     {
-        return $this->hasOne(Service::class);
+        return $this->belongsTo(\App\Domains\Services\Models\Service::class);
     }
 
-    public function registerMediaCollections(): void
+    public function scopeApproved($query)
     {
-        $this->addMediaCollection('before_after')
-            ->useFallbackUrl('/fallback.jpg');
+        return $query->where('approved', true);
     }
 }

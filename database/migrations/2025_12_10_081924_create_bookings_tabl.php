@@ -14,12 +14,13 @@ return new class extends Migration
         Schema::create('bookings', function (Blueprint $table) {
             $table->id();
             $table->foreignId('service_id')->constrained()->cascadeOnDelete();
-            $table->string('client_name');
-            $table->string('client_email');
-            $table->string('client_phone');
-            $table->dateTime('appointment_time');
+            $table->string('client_name')->index();
+            $table->string('client_email')->index();
+            $table->string('client_phone', 20)->index();
+            $table->dateTime('appointment_time')->index();
             $table->enum('status', ['pending', 'confirmed', 'cancelled'])->default('pending');
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

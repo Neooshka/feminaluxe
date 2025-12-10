@@ -1,20 +1,37 @@
-name: CI
+name: CI/CD Pipeline
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [main, master, develop]
+  pull_request:
+    branches: [main, master]
 
 jobs:
-  test:
+  deploy:
+    name: Deploy Feminaluxe
     runs-on: ubuntu-latest
-    services:
-      mysql: ...
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+
     steps:
-      - uses: actions/checkout@v4
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with: { php-version: '8.3' }
-      - run: composer install
-      - run: npm install
-      - run: php artisan key:generate --env=testing
-      - run: php artisan migrate --env=testing
-      - run: php artisan test
-      - run: npm run build
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        env:
+          SERVER_PATH: ${{ secrets.SERVER_PATH }}
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            cd $SERVER_PATH
+            git pull origin main
+            composer install --no-dev
+            npm ci
+            npm run build
+            php artisan migrate --force
+            php artisan config:cache
+            php artisan route:cache
+            php artisan view:cache

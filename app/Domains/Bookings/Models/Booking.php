@@ -1,31 +1,71 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Domains\Bookings\Models;
 
-use App\Domains\Services\Models\Service;
+use Filament\Forms\Components\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Spatie\MediaLibrary\HasMedia;
-use Spatie\MediaLibrary\InteractsWithMedia;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Support\Facades\Event;
 
-class Booking extends Model implements HasMedia
+class Booking extends Model
 {
-    use HasFactory, InteractsWithMedia;
+    use HasFactory, SoftDeletes;
 
-    protected $fillable = ['client_name', 'client_email', 'client_phone', 'appointment_time', 'status'];
-
-    protected $casts = [
-        'appointment_time' => 'datetime',
+    public mixed $status;
+    protected $fillable = [
+        'service_id',
+        'client_name',
+        'client_email',
+        'client_phone',
+        'appointment_time',
+        'status',
     ];
 
-    public function service()
+    protected $casts = [
+        'appointment_time' => 'datetime:Y-m-d H:i:s',  // Custom format for JSON/API
+        'status' => 'string',
+        'deleted_at' => 'datetime',
+    ];
+
+    protected $dispatchesEvents = [
+        'created' => \App\Events\BookingCreated::class,  // For notifications/analytics
+        'updated' => \App\Events\BookingUpdated::class,
+    ];
+
+    public function service(): BelongsTo
     {
-        return $this->hasOne(Service::class);
+        return $this->belongsTo(\App\Domains\Services\Models\Service::class);
     }
 
-    public function registerMediaCollections(): void
+    // Scopes for efficient queries
+    public function scopePending(Builder $query): Builder
     {
-        $this->addMediaCollection('before_after')
-            ->useFallbackUrl('/fallback.jpg');
+        return $query->where('status', 'pending');
+    }
+
+    public function scopeConfirmed(Builder $query): Builder
+    {
+        return $query->where('status', 'confirmed');
+    }
+
+    public function scopeByDate(Builder $query, string $date): Builder
+    {
+        return $query->whereDate('appointment_time', $date);
+    }
+
+    // Custom method for business logic
+    public function confirm(): void
+    {
+        $this->update(['status' => 'confirmed']);
+        // Trigger email or SMS via queue
+    }
+
+    public function cancel(): void
+    {
+        $this->update(['status' => 'cancelled']);
     }
 }

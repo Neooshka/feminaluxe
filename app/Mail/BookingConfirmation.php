@@ -25,7 +25,10 @@ class BookingConfirmation extends Mailable
      */
     public function envelope(): Envelope
     {
-        return new Envelope(from: new Address('noreply@feminaluxe.com', 'Feminaluxe'), subject: 'Подтверждение записи');
+        return new Envelope(
+            from: new Address('noreply@feminaluxe.com', 'Feminaluxe'),
+            subject: 'Подтверждение записи на услугу'
+        );
     }
 
     /**
