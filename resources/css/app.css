@@ -1,0 +1,9 @@
+@import "tailwindcss";
+
+/* Custom theme for beauty site */
+@layer base {
+    :root {
+        --color-primary: #FFB6C1; /* Light pink */
+        --color-accent: #D4AF37; /* Gold */
+    }
+}
