@@ -30,4 +30,12 @@ class Service extends Model implements HasMedia
         $this->addMediaCollection('before_after')
             ->useFallbackUrl('/fallback.jpg');
     }
+
+    /**
+     * Scope for services in a specific category
+     */
+    public function scopeInCategory(Builder $query, string $category): Builder
+    {
+        return $query->where('category', $category);
+    }
 }

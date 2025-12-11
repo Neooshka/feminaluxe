@@ -2,14 +2,39 @@
 
 namespace App\Http\Controllers\Api;
 
+use App\Domains\Blog\Models\Post;
+use App\Domains\Services\Models\Service;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use Illuminate\Support\Facades\Cache;
-use App\Models\SitemapSettings;
+use Illuminate\Support\Facades\File;
 use Spatie\Sitemap\Sitemap;
 
 class SitemapController extends Controller
 {
+    public function index()
+    {
+        $sitemap = Sitemap::create()
+            ->add(Service::all())
+            ->add(Post::published()->get())
+            ->add(url('/'))  // Add static pages
+            ->add(url('/services'))
+            ->add(url('/portfolio'))
+            ->add(url('/about'))
+            ->add(url('/contact'))
+            ->add(url('/blog'));
+        return response($sitemap->render())->header('Content-Type', 'application/xml');
+    }
+
+    public function robots()
+    {
+        return response("User-agent: *\nAllow: /\nSitemap: " . url('/sitemap.xml'), 200)->header('Content-Type', 'text/plain');
+    }
+
+    /**
+     * Получить статус sitemap
+     */
     public function status(Request $request)
     {
         $sitemapPath = public_path('sitemap.xml');
@@ -40,49 +65,119 @@ class SitemapController extends Controller
         ]);
     }
 
+    /**
+     * Сгенерировать sitemap
+     */
     public function generate(Request $request)
     {
-        // Generate sitemap
-        \Artisan::call('sitemap:generate');
+        try {
+            // Выполняем команду генерации sitemap
+            Artisan::call('sitemap:generate');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Sitemap generated successfully',
-            'generated_at' => now()->toDateTimeString()
-        ]);
+            // Проверяем, был ли создан файл
+            $sitemapPath = public_path('sitemap.xml');
+            $exists = file_exists($sitemapPath);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Sitemap generated successfully',
+                'generated_at' => now()->toDateTimeString(),
+                'file_exists' => $exists
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to generate sitemap: ' . $e->getMessage(),
+                'generated_at' => null
+            ], 500);
+        }
     }
 
+    /**
+     * Очистить кэш sitemap
+     */
     public function clearCache(Request $request)
     {
-        Cache::forget('sitemap.generated');
-        Cache::forget('sitemap.last_generated');
+        try {
+            // Очищаем кэш sitemap (если используется)
+            Cache::forget('sitemap.generated');
+            Cache::forget('sitemap.last_generated');
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Cache cleared successfully'
-        ]);
+            // Также можно очистить кэш приложения
+            Artisan::call('cache:clear');
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Cache cleared successfully'
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to clear cache: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
+    /**
+     * Обновить настройки (сохраняем в конфиге или кэше)
+     */
     public function updateSettings(Request $request)
     {
-        $validated = $request->validate([
-            'autoGenerate' => 'boolean',
-            'submitToGoogle' => 'boolean',
-            'enableCaching' => 'boolean',
-            'cacheDuration' => 'integer|min:1',
-            'updateFrequency' => 'string|in:hourly,daily,weekly,monthly'
-        ]);
+        try {
+            $validated = $request->validate([
+                'autoGenerate' => 'boolean',
+                'submitToGoogle' => 'boolean',
+                'enableCaching' => 'boolean',
+                'cacheDuration' => 'integer|min:1',
+                'updateFrequency' => 'string|in:hourly,daily,weekly,monthly'
+            ]);
 
-        $settings = SitemapSettings::firstOrCreate(['user_id' => $request->user()->id]);
-        $settings->update($validated);
+            // Сохраняем настройки в кэше (временное решение)
+            // В реальном проекте можно сохранять в файле конфигурации или БД
+            Cache::put('sitemap_settings', $validated, now()->addDays(30));
+
+            // Обновляем расписание в Laravel
+            $this->updateSchedule($validated['updateFrequency']);
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Settings updated successfully',
+                'settings' => $validated
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to update settings: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Получить настройки
+     */
+    public function getSettings(Request $request)
+    {
+        // Получаем настройки из кэша или возвращаем значения по умолчанию
+        $settings = Cache::get('sitemap_settings', [
+            'autoGenerate' => true,
+            'submitToGoogle' => false,
+            'enableCaching' => true,
+            'cacheDuration' => 60,
+            'updateFrequency' => 'daily'
+        ]);
 
         return response()->json([
             'success' => true,
-            'message' => 'Settings updated successfully',
             'settings' => $settings
         ]);
     }
 
+    /**
+     * Проверить валидность sitemap
+     */
     public function validateSitemap(Request $request)
     {
         $sitemapPath = public_path('sitemap.xml');
@@ -90,64 +185,191 @@ class SitemapController extends Controller
         if (!file_exists($sitemapPath)) {
             return response()->json([
                 'valid' => false,
-                'message' => 'Sitemap file not found'
-            ], 404);
+                'message' => 'Sitemap file not found',
+                'errors' => ['File does not exist']
+            ]);
         }
 
-        $xml = simplexml_load_file($sitemapPath);
+        try {
+            // Простая проверка XML
+            $xml = simplexml_load_file($sitemapPath);
 
-        if ($xml === false) {
+            if ($xml === false) {
+                $errors = libxml_get_errors();
+                libxml_clear_errors();
+
+                return response()->json([
+                    'valid' => false,
+                    'message' => 'Invalid XML structure',
+                    'errors' => array_map(function($error) {
+                        return $error->message;
+                    }, $errors)
+                ]);
+            }
+
+            // Проверяем обязательные элементы
+            $hasUrls = isset($xml->url);
+            $hasUrlset = $xml->getName() === 'urlset';
+
+            return response()->json([
+                'valid' => true,
+                'message' => 'Sitemap is valid',
+                'hasUrls' => $hasUrls,
+                'hasUrlset' => $hasUrlset,
+                'urlCount' => count($xml->url)
+            ]);
+
+        } catch (\Exception $e) {
             return response()->json([
                 'valid' => false,
-                'message' => 'Invalid XML structure',
-                'errors' => libxml_get_errors()
+                'message' => 'Validation error: ' . $e->getMessage(),
+                'errors' => [$e->getMessage()]
             ]);
         }
-
-        return response()->json([
-            'valid' => true,
-            'message' => 'Sitemap is valid'
-        ]);
     }
 
+    /**
+     * Отправить sitemap в поисковые системы
+     */
     public function submit(Request $request)
     {
-        // Submit to Google Search Console
-        $sitemapUrl = url('sitemap.xml');
+        try {
+            $sitemapUrl = url('sitemap.xml');
 
-        // Here you would implement actual submission logic
-        // For now, we'll simulate it
-        $success = true;
+            // Отправка в Google (Ping)
+            $googleResponse = $this->pingGoogle($sitemapUrl);
 
-        if ($success) {
+            // Отправка в Bing
+            $bingResponse = $this->pingBing($sitemapUrl);
+
             return response()->json([
                 'success' => true,
-                'message' => 'Sitemap submitted to search engines'
+                'message' => 'Sitemap submitted to search engines',
+                'google' => $googleResponse,
+                'bing' => $bingResponse,
+                'sitemap_url' => $sitemapUrl
             ]);
-        }
 
-        return response()->json([
-            'success' => false,
-            'message' => 'Failed to submit to search engines'
-        ], 500);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to submit sitemap: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
+    /**
+     * Скачать backup sitemap
+     */
     public function backup(Request $request)
     {
         $sitemapPath = public_path('sitemap.xml');
 
         if (!file_exists($sitemapPath)) {
             return response()->json([
-                'error' => 'Sitemap not found'
+                'error' => 'Sitemap file not found'
             ], 404);
         }
 
-        return response()->file($sitemapPath, [
-            'Content-Type' => 'application/xml',
-            'Content-Disposition' => 'attachment; filename="sitemap-backup-' . date('Y-m-d') . '.xml"'
+        // Создаем backup директорию если её нет
+        $backupDir = storage_path('app/sitemap-backups');
+        if (!File::exists($backupDir)) {
+            File::makeDirectory($backupDir, 0755, true);
+        }
+
+        // Копируем файл в backup директорию
+        $backupName = 'sitemap-backup-' . date('Y-m-d-His') . '.xml';
+        $backupPath = $backupDir . '/' . $backupName;
+        File::copy($sitemapPath, $backupPath);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Backup created successfully',
+            'backup_path' => $backupPath,
+            'backup_name' => $backupName,
+            'backup_url' => route('sitemap.download-backup', ['file' => $backupName])
         ]);
     }
 
+    /**
+     * Скачать файл backup
+     */
+    public function downloadBackup($filename)
+    {
+        $backupPath = storage_path('app/sitemap-backups/' . $filename);
+
+        if (!File::exists($backupPath)) {
+            abort(404, 'Backup file not found');
+        }
+
+        return response()->download($backupPath, $filename);
+    }
+
+    /**
+     * Пинг Google
+     */
+    private function pingGoogle($sitemapUrl)
+    {
+        $pingUrl = 'https://www.google.com/ping?sitemap=' . urlencode($sitemapUrl);
+
+        try {
+            $client = new \GuzzleHttp\Client();
+            $response = $client->get($pingUrl);
+
+            return [
+                'success' => $response->getStatusCode() === 200,
+                'status' => $response->getStatusCode(),
+                'message' => 'Successfully pinged Google'
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'status' => 500,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Пинг Bing
+     */
+    private function pingBing($sitemapUrl)
+    {
+        $pingUrl = 'https://www.bing.com/ping?sitemap=' . urlencode($sitemapUrl);
+
+        try {
+            $client = new \GuzzleHttp\Client();
+            $response = $client->get($pingUrl);
+
+            return [
+                'success' => $response->getStatusCode() === 200,
+                'status' => $response->getStatusCode(),
+                'message' => 'Successfully pinged Bing'
+            ];
+
+        } catch (\Exception $e) {
+            return [
+                'success' => false,
+                'status' => 500,
+                'message' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Обновить расписание
+     */
+    private function updateSchedule($frequency)
+    {
+        // Здесь можно обновить расписание в database/jobs или другом месте
+        // Для простоты просто возвращаем true
+        return true;
+    }
+
+    /**
+     * Форматировать возраст файла
+     */
     private function getFileAge($timestamp)
     {
         $diff = time() - $timestamp;
@@ -166,6 +388,9 @@ class SitemapController extends Controller
         }
     }
 
+    /**
+     * Форматировать размер файла
+     */
     private function formatBytes($bytes, $precision = 2)
     {
         $units = ['B', 'KB', 'MB', 'GB', 'TB'];

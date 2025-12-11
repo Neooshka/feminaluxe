@@ -1,7 +1,7 @@
 <script setup>
 import { defineProps } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import PostCard from '@/Components/PostCard.vue';  // Создадим ниже
+import PostCard from '@/Components/PostCard.vue';
 
 const props = defineProps({
   posts: Array,

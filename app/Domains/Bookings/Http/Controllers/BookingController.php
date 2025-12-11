@@ -6,6 +6,7 @@ namespace App\Domains\Bookings\Http\Controllers;
 
 use App\Domains\Bookings\Models\Booking;
 use App\Http\Controllers\Controller;
+use App\Jobs\SendBookingSms;
 use App\Mail\BookingConfirmation;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -26,6 +27,9 @@ class BookingController extends Controller
         ]);
 
         $booking = Booking::create($validated);
+
+        // Отправка СМС
+//        SendBookingSms::dispatch($booking);
 
         // Emails queued via event listener now (better separation)
 
