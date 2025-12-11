@@ -26,7 +26,7 @@ jobs:
           key: ${{ secrets.SSH_PRIVATE_KEY }}
           port: 22
           script: |
-            cd $SERVER_PATH
+            cd /home/neo/sites/feminaluxe.ru
             git pull origin main
             composer install --no-dev
             npm ci
