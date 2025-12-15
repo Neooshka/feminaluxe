@@ -8,6 +8,7 @@ export default defineConfig({
         laravel({
             input: ['resources/css/app.css', 'resources/js/app.js'],
             refresh: true,
+            buildDirectory: 'build',
         }),
         vue({
             template: {
@@ -17,6 +18,24 @@ export default defineConfig({
                 },
             },
         }),
+
         tailwindcss(),
     ],
+    resolve: {
+        alias: {
+            '@': '/resources/js',
+        },
+    },
+    build: {
+        rollupOptions: {
+            output: {
+                manualChunks: undefined,
+                entryFileNames: `assets/[name].js`,
+                chunkFileNames: `assets/[name].js`,
+                assetFileNames: `assets/[name].[ext]`
+            }
+        },
+        // Отключаем предзагрузку
+        modulePreload: false,
+    },
 });

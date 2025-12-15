@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
+use Inertia\Inertia;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,5 +22,13 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(100);
+        Inertia::share([
+            'ziggy' => function () {
+                return [
+                    'routes' => app('router')->getRoutes()->getRoutesByName(),
+                    'url' => url('/'),
+                ];
+            },
+        ]);
     }
 }

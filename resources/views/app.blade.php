@@ -25,9 +25,8 @@
         <!-- Vite assets with HMR in dev, production bundles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
 
-        <!-- Preload assets for performance (best practice 2025) -->
-        <link rel="preload" href="{{ \Illuminate\Support\Facades\Vite::asset('resources/js/app.js') }}" as="script" />
-        <link rel="preload" href="{{ \Illuminate\Support\Facades\Vite::asset('resources/css/app.css') }}" as="style" />
+        <!-- Inertia head for dynamic title and other head elements -->
+        @inertiaHead
 
         <!-- Google Fonts for beauty theme (elegant fonts) -->
         <link rel="preconnect" href="https://fonts.googleapis.com" />

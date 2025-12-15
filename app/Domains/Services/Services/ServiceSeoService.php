@@ -7,6 +7,7 @@ namespace App\Domains\Services\Services;
 use App\Domains\Services\Data\ServiceShowData;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
+use RalphJSmit\Laravel\SEO\SchemaCollection;
 use RalphJSmit\Laravel\SEO\Support\SEOData;
 
 class ServiceSeoService
@@ -16,32 +17,55 @@ class ServiceSeoService
         return new SEOData(
             title: $this->getIndexTitle(),
             description: $this->getIndexDescription(),
+            author: 'Feminaluxe Studio',
             image: asset('img/seo/services-og.jpg'),
             published_time: Carbon::now(),
             modified_time: Carbon::now(),
-            openGraphTitle: 'Услуги перманентного макияжа премиум-класса | Feminaluxe',
-            twitterTitle: 'Элитный перманентный макияж в Москве | Feminaluxe',
-            author: 'Feminaluxe Studio',
+            schema: $this->generateServiceCollectionSchema(),
             robots: 'index, follow, max-image-preview:large',
-            canonical: route('services.index'),
-            schema: $this->generateServiceCollectionSchema()
+            canonical_url: route('services.index'),
+            openGraphTitle: 'Услуги перманентного макияжа премиум-класса | Feminaluxe'
         );
     }
 
-    public function generateShowSeoData(ServiceShowData $service): SEOData
+    /**
+     * Generate generic SEO data
+     */
+    public function generateSeoData(
+        string $title,
+        string $description,
+        ?string $image = null,
+        ?string $canonical = null,
+        ?Carbon $publishedTime = null,
+        ?Carbon $modifiedTime = null
+    ): SEOData {
+        $seoData = new SEOData(
+            title: $title,
+            description: $description,
+            author: 'Feminaluxe Studio',
+            image: $image ?? asset('img/seo/default-og.jpg'),
+            published_time: $publishedTime ?? Carbon::now(),
+            modified_time: $modifiedTime ?? Carbon::now(),
+            robots: 'index, follow',
+            canonical_url: $canonical ?? url()->current(),
+        );
+
+        $seoData->openGraphTitle = $title;
+
+        return $seoData;
+    }
+    public function generateShowSeoData(array $service): SEOData
     {
         return new SEOData(
             title: $this->getShowTitle($service),
             description: $this->getShowDescription($service),
-            image: $service->primary_image ?: asset('img/seo/default-og.jpg'),
-            published_time: $service->created_at,
-            modified_time: $service->updated_at,
-            openGraphTitle: $service->name . ' | Feminaluxe',
-            twitterTitle: $service->name . ' - Перманентный макияж',
             author: 'Feminaluxe Studio',
+            image: $service['primary_image_url'] ?? asset('img/seo/default-og.jpg'),
+            published_time: Carbon::parse($service['created_at'] ?? now()),
+            modified_time: Carbon::parse($service['updated_at'] ?? now()),
             robots: 'index, follow',
-            canonical: route('services.show', $service->slug),
-            schema: null // Will be added via structuredData in controller
+            canonical_url: route('services.show', $service['slug']),
+            openGraphTitle: $service['name'] . ' | Feminaluxe' // Will be added via structuredData in controller
         );
     }
 
@@ -70,27 +94,27 @@ class ServiceSeoService
         ];
     }
 
-    public function getShowTitle(ServiceShowData $service): string
+    public function getShowTitle(array $service): string
     {
         return sprintf('%s - цена %s руб. | Перманентный макияж в Москве | Feminaluxe',
-            $service->name,
-            number_format($service->price, 0, '', ' ')
+            $service['name'],
+            number_format($service['final_price'], 0, '', ' ')
         );
     }
 
-    public function getShowDescription(ServiceShowData $service): string
+    public function getShowDescription(array $service): string
     {
-        $baseDescription = Str::limit(strip_tags($service->description), 120);
+        $baseDescription = Str::limit(strip_tags($service['description'] ?? $service['short_description'] ?? ''), 120);
 
         return sprintf('%s Цена: %s руб. ✅ Гарантия результата ✅ Используем сертифицированные пигменты ✅ Бесплатная коррекция через месяц. Запишитесь онлайн!',
             $baseDescription,
-            number_format($service->price, 0, '', ' ')
+            number_format($service['final_price'], 0, '', ' ')
         );
     }
 
-    public function generateServiceStructuredData(ServiceShowData $service): array
+    public function generateServiceStructuredData(array $service): array
     {
-        return [
+        $structuredData = [
             '@context' => 'https://schema.org',
             '@type' => 'Service',
             'serviceType' => 'BeautyService',
@@ -106,31 +130,37 @@ class ServiceSeoService
                 'telephone' => '+7 (495) 123-45-67',
                 'priceRange' => '$$$',
             ],
-            'name' => $service->name,
-            'description' => strip_tags($service->short_description),
+            'name' => $service['name'],
+            'description' => strip_tags($service['short_description'] ?? ''),
             'offers' => [
                 '@type' => 'Offer',
-                'price' => $service->price,
+                'price' => $service['final_price'],
                 'priceCurrency' => 'RUB',
                 'availability' => 'https://schema.org/InStock',
-                'validFrom' => $service->created_at->toIso8601String(),
+                'validFrom' => Carbon::parse($service['created_at'] ?? now())->toIso8601String(),
             ],
-            'aggregateRating' => $service->rating > 0 ? [
-                '@type' => 'AggregateRating',
-                'ratingValue' => $service->rating,
-                'reviewCount' => $service->reviews_count,
-            ] : null,
         ];
+
+        if (($service['rating'] ?? 0) > 0) {
+            $structuredData['aggregateRating'] = [
+                '@type' => 'AggregateRating',
+                'ratingValue' => $service['rating'],
+                'reviewCount' => $service['reviews_count'],
+            ];
+        }
+
+        return $structuredData;
     }
 
-    private function generateServiceCollectionSchema(): array
+    private function generateServiceCollectionSchema(): SchemaCollection
     {
-        return [
-            '@context' => 'https://schema.org',
-            '@type' => 'ItemList',
-            'itemListElement' => [],
-            'name' => 'Услуги перманентного макияжа',
-            'description' => 'Полный перечень услуг по перманентному макияжу в салоне Feminaluxe',
-        ];
+        return SchemaCollection::make()
+            ->add(fn(SEOData $SEOData) => [
+                '@context' => 'https://schema.org',
+                '@type' => 'ItemList',
+                'itemListElement' => [],
+                'name' => 'Услуги перманентного макияжа',
+                'description' => 'Полный перечень услуг по перманентному макияжу в салоне Feminaluxe',
+            ]);
     }
 }

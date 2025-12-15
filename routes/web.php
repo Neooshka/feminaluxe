@@ -7,32 +7,22 @@ use App\Domains\Bookings\Http\Controllers\BookingController;
 use App\Domains\Services\Http\Controllers\ServiceController;
 use App\Domains\Services\Models\Service;
 use App\Http\Controllers\Api\SitemapController;
+use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
+use Tighten\Ziggy\Ziggy;
 
-Route::get('/', function () {
-    return Inertia::render('Home', [
-        'services' => Service::with('media')->get()->map(fn($s) => [
-            'id' => $s->id,
-            'name' => $s->name,
-            'description' => Str::limit($s->description, 100),
-            'price' => $s->price,
-            'images' => $s->getMedia('before_after')->map->getUrl('thumb'),
-        ]),
-    ])->withViewData([
-        'seo' => [
-            'title' => 'Feminaluxe: Перманентный макияж',
-            'description' => 'Профессиональные услуги по перманентному макияжу бровей, губ и межресничек. Запишитесь онлайн и преобразитесь!',
-            'keywords' => 'перманентный макияж, брови, губы, межресничка, красота, Москва',
-            'og:title' => 'Feminaluxe - Ваш путь к совершенству',
-            'og:description' => 'Естественный макияж на годы. Фото до/после и отзывы клиентов.',
-            'og:image' => asset('og-home.jpg'),
-        ],
-    ]);
-})->name('home');
+Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::resource('services', ServiceController::class)->only(['index', 'show'])->names(['index' => 'services.index', 'show' => 'services.show']);
+Route::middleware(['throttle:60,1'])->group(function () {
+    Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
+    Route::get('/services/filter', [ServiceController::class, 'filter'])->name('services.filter');
+    Route::get('/services/popular', [ServiceController::class, 'popular'])->name('services.popular');
+    Route::get('/services/category/{categorySlug}', [ServiceController::class, 'category'])->name('services.category');
+    Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('services.show');
+});
+
 Route::resource('blog', PostController::class)->only(['index', 'show'])->parameters(['blog' => 'post:slug'])->names(['index' => 'blog.index', 'show' => 'blog.show']);
 
 Route::get('/portfolio', function () {
@@ -64,4 +54,13 @@ Route::get('/sitemap/status', [SitemapController::class, 'status'])->name('sitem
 // Защищенный маршрут для генерации (используйте middleware)
 Route::middleware(['auth', 'admin'])->group(function () {
     Route::get('/sitemap/generate', [SitemapController::class, 'generate'])->name('sitemap.generate');
+});
+
+// Явно указываем маршруты для Ziggy в блейде
+Route::middleware(['web'])->group(function () {
+    Route::get('/ziggy', function () {
+        return response()->json(
+            (new Ziggy('web'))->toArray()
+        );
+    })->name('ziggy');
 });
