@@ -1,4 +1,4 @@
-export const Ziggy {
+export const Ziggy = {
     "url": "https:\/\/feminaluxe",
     "port": null,
     "defaults": [],
