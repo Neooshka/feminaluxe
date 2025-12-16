@@ -50,7 +50,7 @@
                             <span class="font-semibold">+7 (495) 123-45-67</span>
                         </a>
                         <Link
-                            :href="route('services.index')"
+                            :href="route('bookings.create')"
                             class="btn-gradient-primary px-6 py-3 hover:shadow-rose-strong"
                         >
                             Записаться онлайн
@@ -115,7 +115,7 @@
                             <span class="font-semibold">+7 (495) 123-45-67</span>
                         </a>
                         <Link
-                            :href="route('services.index')"
+                            :href="route('bookings.create')"
                             @click="isMenuOpen = false"
                             class="block w-full btn-gradient-primary text-center"
                         >
@@ -259,11 +259,10 @@ const isScrolled = ref(false);
 // Навигационные пункты
 const navItems = [
     {name: 'Услуги', href: route('services.index')},
-    {name: 'Цены', href: '#pricing'},
-    {name: 'Работы', href: '#portfolio'},
-    {name: 'Отзывы', href: '#reviews'},
-    {name: 'Специалисты', href: '#specialists'},
-    {name: 'Контакты', href: '#contacts'},
+    {name: 'Работы', href: route('portfolio')},
+    {name: 'Отзывы', href: route('reviews.index')},
+    {name: 'Блог', href: route('blog.index')},
+    {name: 'Контакты', href: route('contact')},
 ];
 
 // Обработка скролла для изменения хедера

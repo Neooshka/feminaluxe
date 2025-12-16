@@ -3,6 +3,7 @@
     <head>
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+        <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="robots" content="index, follow" />
 
         <!-- Dynamic SEO render -->
@@ -18,9 +19,6 @@
         <link rel="manifest" href="{{ asset('site.webmanifest') }}" /> <!-- For PWA if needed -->
 
         @routes
-
-        <!-- Inertia head for dynamic title and other head elements -->
-        @inertiaHead
 
         <!-- Vite assets with HMR in dev, production bundles -->
         @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -44,8 +42,6 @@
                 gtag('config', 'G-XXXXXXXXXX');
             </script>
         @endif
-
-        <!-- Performance: Defer non-critical JS -->
     </head>
     <body class="antialiased bg-beige-100 font-sans text-gray-900 leading-normal">
         <!-- Inertia root for Vue SPA rendering -->

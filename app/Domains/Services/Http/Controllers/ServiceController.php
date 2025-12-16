@@ -383,12 +383,15 @@ class ServiceController extends Controller
         // Convert URL slug to category name (e.g., "permanent-brovey" -> "Перманент бровей")
         $categoryName = $this->normalizeCategoryName($category);
 
+        // Получаем информацию о категории из CategoryService
+        $categoryInfo = $this->getCategoryInfo($categoryName);
+
         $cacheKey = $this->cacheService->generateIndexKey($request) . ':category:' . $category;
 
         $services = $this->cacheService->rememberWithFallback(
             $cacheKey,
             ['services.category', 'category.' . $categoryName],
-            1800, // 30 minutes TTL
+            1800,
             function () use ($categoryName) {
                 return Service::query()
                     ->with(['media'])
@@ -432,16 +435,23 @@ class ServiceController extends Controller
             }
         );
 
-        if ($services->isEmpty()) {
+        if (empty($services)) {
             abort(404);
         }
 
-        $categorySEO = $this->generateCategorySeoData($categoryName, $services);
+        // Используем данные из CategoryService для SEO
+        $categorySEO = $this->generateCategorySeoData(
+            $categoryInfo['display_name'],
+            $services,
+            $categoryInfo['description'],
+            $categoryInfo['icon']
+        );
 
         return Inertia::render('Services/Category', [
             'services' => $services,
-            'category' => $categoryName,
+            'category' => $categoryInfo['display_name'],
             'category_slug' => $category,
+            'category_info' => $categoryInfo, // Передаем всю информацию о категории
             'meta' => [
                 'title' => $categorySEO['title'],
                 'description' => $categorySEO['description'],
@@ -449,6 +459,38 @@ class ServiceController extends Controller
         ])->withViewData([
             'SEOData' => $categorySEO['seo_data'],
         ]);
+    }
+
+    /**
+     * Get comprehensive category information using CategoryService
+     */
+    private function getCategoryInfo(string $categoryName): array
+    {
+        // Используем CategoryService для получения отображаемого имени
+        $displayName = $this->categoryService->getDisplayName($categoryName);
+
+        // Получаем slug из CategoryService
+        $slug = $this->categoryService->generateSlug($categoryName);
+
+        // Получаем иконку и описание
+        $icon = $this->categoryService->getIcon($categoryName);
+        $description = $this->categoryService->getDescription($categoryName);
+
+        // Получаем статистику категории
+        $categoryServices = $this->categoryService->getServicesByCategory($categoryName);
+
+        return [
+            'original_name' => $categoryName,
+            'display_name' => $displayName,
+            'slug' => $slug,
+            'icon' => $icon,
+            'description' => $description,
+            'services_count' => $categoryServices->count(),
+            'total_views' => $categoryServices->sum('views_count'),
+            'average_rating' => $categoryServices->avg('rating') ?? 0,
+            'min_price' => $categoryServices->min('price') ?? 0,
+            'max_price' => $categoryServices->max('price') ?? 0,
+        ];
     }
 
     /**

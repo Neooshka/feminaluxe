@@ -18,11 +18,17 @@ class Review extends Model
         'content',
         'rating',
         'approved',
+        'email',
+        'phone',
+        'ip_address',
+        'user_agent',
     ];
 
     protected $casts = [
         'rating' => 'integer',
         'approved' => 'boolean',
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
     ];
 
     public function service(): BelongsTo
@@ -33,5 +39,24 @@ class Review extends Model
     public function scopeApproved($query)
     {
         return $query->where('approved', true);
+    }
+
+    // Новые методы
+    public function scopeForService($query, $serviceId)
+    {
+        return $query->where('service_id', $serviceId);
+    }
+
+    public function scopeWithRating($query, $rating)
+    {
+        return $query->where('rating', $rating);
+    }
+
+    public function scopeSearch($query, $search)
+    {
+        return $query->where(function ($q) use ($search) {
+            $q->where('content', 'like', '%' . $search . '%')
+              ->orWhere('author', 'like', '%' . $search . '%');
+        });
     }
 }

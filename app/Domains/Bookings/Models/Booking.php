@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Domains\Bookings\Models;
 
+use App\Domains\Services\Models\Service;
+use App\Events\BookingCreated;
+use App\Events\BookingUpdated;
 use Filament\Forms\Components\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -32,13 +35,13 @@ class Booking extends Model
     ];
 
     protected $dispatchesEvents = [
-        'created' => \App\Events\BookingCreated::class,  // For notifications/analytics
-        'updated' => \App\Events\BookingUpdated::class,
+        'created' => BookingCreated::class,  // For notifications/analytics
+        'updated' => BookingUpdated::class,
     ];
 
     public function service(): BelongsTo
     {
-        return $this->belongsTo(\App\Domains\Services\Models\Service::class);
+        return $this->belongsTo(Service::class);
     }
 
     // Scopes for efficient queries

@@ -78,7 +78,7 @@ class CategoryService
         return $query->get();
     }
 
-    private function getDisplayName(string $category): string
+    public function getDisplayName(string $category): string
     {
         $names = [
             'Брови' => 'Брови',
@@ -95,7 +95,7 @@ class CategoryService
         return $names[$category] ?? $category;
     }
 
-    private function generateSlug(string $category): string
+    public function generateSlug(string $category): string
     {
         $slugMap = [
             'Брови' => 'brovi',
@@ -113,7 +113,7 @@ class CategoryService
             mb_strtolower(preg_replace('/[^a-zа-яё0-9]+/iu', '-', $category));
     }
 
-    private function getIcon(string $category): string
+    public function getIcon(string $category): string
     {
         $icons = [
             'Брови' => '👁️',
@@ -129,7 +129,7 @@ class CategoryService
         return $icons[$category] ?? '🎀';
     }
 
-    private function getDescription(string $category): string
+    public function getDescription(string $category): string
     {
         $descriptions = [
             'Брови' => 'Идеальная форма и цвет бровей',

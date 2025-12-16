@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use App\Domains\Blog\Http\Controllers\PostController;
 use App\Domains\Bookings\Http\Controllers\BookingController;
+use App\Domains\Reviews\Http\Controllers\ReviewController;
 use App\Domains\Services\Http\Controllers\ServiceController;
 use App\Domains\Services\Models\Service;
 use App\Http\Controllers\Api\SitemapController;
@@ -34,17 +35,31 @@ Route::get('/portfolio', function () {
     return Inertia::render('Portfolio', ['images' => $images]);
 })->name('portfolio');
 
-Route::get('/about', function () {
-    return Inertia::render('About', []);
-})->name('about');
-
 Route::get('/contact', function () {
     return Inertia::render('Contact', [
         'services' => Service::select('id', 'name')->get(),
     ]);
 })->name('contact');
 
-Route::post('/bookings', [BookingController::class, 'store'])->name('bookings.store')->middleware('throttle:10,1');
+Route::get('/privacy', function () {
+    return "Текст политки конфиденциальности";
+})->name('privacy');
+
+// Бронирования
+Route::prefix('bookings')->middleware(['throttle:10,1'])->name('bookings.')->group(function () {
+    Route::get('/create', [BookingController::class, 'create'])->name('create');
+    Route::post('/store', [BookingController::class, 'store'])->name('store');
+    Route::get('/success/{booking}', [BookingController::class, 'success'])
+        ->name('success')
+        ->middleware(['signed']);
+});
+
+// Отзывы
+Route::prefix('reviews')->middleware(['throttle:60,1'])->name('reviews.')->group(function () {
+    Route::get('/', [ReviewController::class, 'index'])->name('index');
+    Route::get('/service/{serviceSlug}', [ReviewController::class, 'serviceReviews'])->name('service');
+    Route::post('/', [ReviewController::class, 'store'])->name('store');
+});
 
 // SEO routes
 Route::get('/sitemap.xml', [SitemapController::class, 'index'])->name('sitemap');
@@ -64,3 +79,6 @@ Route::middleware(['web'])->group(function () {
         );
     })->name('ziggy');
 });
+
+
+

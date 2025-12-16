@@ -14,8 +14,10 @@
         "vite": "^7.0.7"
     },
     "dependencies": {
+        "@heroicons/vue": "^2.2.0",
         "@inertiajs/vue3": "^2.2.20",
         "@vitejs/plugin-vue": "^6.0.2",
+        "date-fns": "^4.1.0",
         "marked": "^17.0.1",
         "vue": "^3.5.25",
         "ziggy-js": "^2.6.0"

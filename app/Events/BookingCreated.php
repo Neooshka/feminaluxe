@@ -9,17 +9,20 @@ use Illuminate\Broadcasting\PrivateChannel;
 use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
+use App\Domains\Bookings\Models\Booking;
 
 class BookingCreated
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
+    public Booking $booking;
+
     /**
      * Create a new event instance.
      */
-    public function __construct()
+    public function __construct(Booking $booking)
     {
-        //
+        $this->booking = $booking;
     }
 
     /**

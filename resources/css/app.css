@@ -3,6 +3,14 @@
 
 /* Custom theme for beauty site */
 :root {
+    --primary-color: #ec4899;
+    --primary-dark: #db2777;
+    --primary-rgb: 236, 72, 153;
+    --accent-color: #8b5cf6;
+    --success-color: #10b981;
+    --warning-color: #f59e0b;
+    --danger-color: #ef4444;
+
     --color-primary: #FFB6C1; /* Light pink */
     --color-accent: #D4AF37; /* Gold */
 
@@ -58,6 +66,11 @@
     --color-gray-700: #374151;
     --color-gray-800: #1f2937;
     --color-gray-900: #111827;
+}
+
+/* Smooth scrolling for the entire site */
+html {
+    scroll-behavior: smooth;
 }
 
 /* =========== КАСТОМНЫЕ ГРАДИЕНТНЫЕ КЛАССЫ =========== */
@@ -429,4 +442,10 @@
 
 .-translate-y-2 {
     transform: translateY(-0.5rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
