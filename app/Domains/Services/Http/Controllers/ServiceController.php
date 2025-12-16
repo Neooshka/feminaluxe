@@ -7,6 +7,7 @@ namespace App\Domains\Services\Http\Controllers;
 use App\Domains\Services\Models\Service;
 use App\Domains\Services\Services\ServiceCacheService;
 use App\Domains\Services\Services\ServiceSeoService;
+use App\Domains\Services\Services\CategoryService;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -19,6 +20,7 @@ class ServiceController extends Controller
     public function __construct(
         private readonly ServiceCacheService $cacheService,
         private readonly ServiceSeoService   $seoService,
+        private readonly CategoryService   $categoryService,
     )
     {
     }
@@ -99,7 +101,7 @@ class ServiceController extends Controller
 
         return Inertia::render('Services/Index', [
             'services' => $services,
-            'categories' => $services->unique('category')->pluck('category')->toArray(),
+            'categories' => $this->categoryService->getCategoriesWithCounts(),
             'popular_services' => $popularServices,
             'meta' => [
                 'title' => $this->seoService->getIndexTitle(),

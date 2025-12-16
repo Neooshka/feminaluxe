@@ -15,12 +15,12 @@ use Tighten\Ziggy\Ziggy;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
 
-Route::middleware(['throttle:60,1'])->group(function () {
-    Route::get('/services', [ServiceController::class, 'index'])->name('services.index');
-    Route::get('/services/filter', [ServiceController::class, 'filter'])->name('services.filter');
-    Route::get('/services/popular', [ServiceController::class, 'popular'])->name('services.popular');
-    Route::get('/services/category/{categorySlug}', [ServiceController::class, 'category'])->name('services.category');
-    Route::get('/services/{slug}', [ServiceController::class, 'show'])->name('services.show');
+Route::prefix('services')->middleware(['throttle:60,1'])->name('services.')->group(function () {
+    Route::get('/', [ServiceController::class, 'index'])->name('index');
+    Route::get('/filter', [ServiceController::class, 'filter'])->name('filter');
+    Route::get('/popular', [ServiceController::class, 'popular'])->name('popular');
+    Route::get('/category/{categorySlug}', [ServiceController::class, 'category'])->name('category');
+    Route::get('/{slug}', [ServiceController::class, 'show'])->name('show');
 });
 
 Route::resource('blog', PostController::class)->only(['index', 'show'])->parameters(['blog' => 'post:slug'])->names(['index' => 'blog.index', 'show' => 'blog.show']);

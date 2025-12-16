@@ -18,7 +18,7 @@ class GenerateZiggyRoutes extends Command
 
         file_put_contents(
             base_path($path),
-            'export const Ziggy = ' . json_encode($ziggy->toArray(), JSON_PRETTY_PRINT) . ';'
+            'export default ' . json_encode($ziggy->toArray(), JSON_PRETTY_PRINT) . ';'
         );
 
         $this->info('Ziggy routes generated successfully!');

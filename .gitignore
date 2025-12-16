@@ -36,3 +36,6 @@ auth.json
 /public/upload
 */temp/
 /chrome/
+
+# auto generating files on deploy
+/resources/js/ziggy.js

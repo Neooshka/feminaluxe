@@ -6,6 +6,7 @@ namespace App\Http\Controllers;
 
 use App\Domains\Services\Models\Service;
 use App\Domains\Services\Services\ServiceCacheService;
+use App\Domains\Services\Services\CategoryService;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -14,12 +15,13 @@ class HomeController extends Controller
 {
     public function __construct(
         private readonly ServiceCacheService $cacheService,
+        private readonly CategoryService $categoryService,
     ) {}
 
     public function index(Request $request): Response
     {
         // Кэширование главной страницы
-        $cacheKey = 'home_page:' . app()->getLocale();
+        $cacheKey = $this->cacheService->generateIndexKey($request);
 
         $data = $this->cacheService->rememberWithFallback(
             $cacheKey,
@@ -32,7 +34,7 @@ class HomeController extends Controller
                     ->active()
                     ->orderBy('sort_order')
                     ->orderBy('created_at', 'desc')
-                    ->limit(6)
+                    ->limit(12)
                     ->get()
                     ->map(function ($service) {
                         return [
@@ -58,9 +60,13 @@ class HomeController extends Controller
                 // Популярные услуги
                 $popularServices = $this->cacheService->getPopularServices(3);
 
+                // Получаем все уникальные категории из базы
+                $categories = $this->categoryService->getCategoriesWithCounts();
+
                 return [
                     'services' => $services,
                     'popularServices' => $popularServices,
+                    'categories' => $categories
                 ];
             },
             function () {
@@ -68,6 +74,7 @@ class HomeController extends Controller
                 return [
                     'services' => [],
                     'popularServices' => [],
+                    'categories' => [],
                 ];
             }
         );
