@@ -271,14 +271,14 @@ class BookingResource extends Resource
     public static function getNavigationItems(): array
     {
         return [
-            \Filament\Navigation\NavigationItem::make()
+            NavigationItem::make()
                 ->label(static::getNavigationLabel())
                 ->icon(static::getNavigationIcon())
                 ->group(static::getNavigationGroup())
                 ->sort(static::getNavigationSort())
                 ->url(static::getUrl('index')),
 
-            \Filament\Navigation\NavigationItem::make()
+            NavigationItem::make()
                 ->label('Календарь')
                 ->icon('heroicon-o-calendar')
                 ->group(static::getNavigationGroup())

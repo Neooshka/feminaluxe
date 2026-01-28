@@ -3,6 +3,7 @@
 namespace App\Providers\Filament;
 
 use App\Filament\Navigation\CustomNavigation;
+use App\Filament\Resources\BookingResource\Pages\CalendarBookings;
 use App\Filament\Widgets\BookingStats;
 use App\Filament\Widgets\LatestReviews;
 use App\Filament\Widgets\PopularServices;
@@ -22,6 +23,7 @@ use Illuminate\Foundation\Http\Middleware\VerifyCsrfToken;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Session\Middleware\StartSession;
 use Illuminate\View\Middleware\ShareErrorsFromSession;
+use Saade\FilamentFullCalendar\FilamentFullCalendarPlugin;
 
 class AdminPanelProvider extends PanelProvider
 {
@@ -61,6 +63,8 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->authMiddleware([
                 Authenticate::class,
-            ]);
+            ])
+            ->viteTheme('resources/css/filament/admin/theme.css')
+            ->plugin(FilamentFullCalendarPlugin::make());
     }
 }
