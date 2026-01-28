@@ -2,6 +2,10 @@
 
 namespace App\Providers\Filament;
 
+use App\Filament\Navigation\CustomNavigation;
+use App\Filament\Widgets\BookingStats;
+use App\Filament\Widgets\LatestReviews;
+use App\Filament\Widgets\PopularServices;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\AuthenticateSession;
 use Filament\Http\Middleware\DisableBladeIconComponents;
@@ -38,6 +42,9 @@ class AdminPanelProvider extends PanelProvider
             ])
             ->discoverWidgets(in: app_path('Filament/Widgets'), for: 'App\Filament\Widgets')
             ->widgets([
+                BookingStats::class,
+                LatestReviews::class,
+                PopularServices::class,
                 AccountWidget::class,
                 FilamentInfoWidget::class,
             ])

@@ -1,12 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Filament\Resources\BookingResource\Pages;
 
 use App\Filament\Resources\BookingResource;
-use Filament\Actions\DeleteAction;
-use Filament\Actions\ViewAction;
+use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
 class EditBooking extends EditRecord
@@ -16,16 +13,8 @@ class EditBooking extends EditRecord
     protected function getHeaderActions(): array
     {
         return [
-            ViewAction::make()
-                ->label('Просмотр'),
-            DeleteAction::make()
-                ->label('Удалить'),
+            Actions\DeleteAction::make(),
         ];
-    }
-
-    protected function afterSave(): void
-    {
-        // Optional: Log changes or notify
     }
 
     protected function getRedirectUrl(): string

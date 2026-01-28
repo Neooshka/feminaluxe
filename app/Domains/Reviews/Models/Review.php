@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Domains\Reviews\Models;
 
+use Database\Factories\ReviewFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -58,5 +59,10 @@ class Review extends Model
             $q->where('content', 'like', '%' . $search . '%')
               ->orWhere('author', 'like', '%' . $search . '%');
         });
+    }
+    
+    protected static function newFactory()
+    {
+        return ReviewFactory::new();
     }
 }

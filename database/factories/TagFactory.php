@@ -1,0 +1,28 @@
+<?php
+
+namespace Database\Factories;
+
+use App\Domains\Blog\Models\Tag;
+use Illuminate\Database\Eloquent\Factories\Factory;
+use Illuminate\Support\Str;
+
+/**
+ * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Domains\Blog\Models\Tag>
+ */
+class TagFactory extends Factory
+{
+    protected $model = Tag::class;
+    /**
+     * Define the model's default state.
+     *
+     * @return array<string, mixed>
+     */
+    public function definition(): array
+    {
+        $name = $this->faker->unique()->word();
+        return [
+            'name' => $name,
+            'slug' => Str::slug($name),
+        ];
+    }
+}

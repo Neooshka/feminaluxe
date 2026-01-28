@@ -2,6 +2,7 @@
 
 namespace App\Domains\Services\Models;
 
+use Database\Factories\ServiceFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -265,5 +266,10 @@ class Service extends Model implements HasMedia
         }
 
         return self::where('slug', $identifier)->first();
+    }
+    
+    protected static function newFactory()
+    {
+        return ServiceFactory::new();
     }
 }

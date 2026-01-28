@@ -1,11 +1,9 @@
 <?php
 
-declare(strict_types=1);
-
 namespace App\Filament\Resources\BookingResource\Pages;
 
 use App\Filament\Resources\BookingResource;
-use Filament\Actions\CreateAction;
+use Filament\Actions;
 use Filament\Resources\Pages\ListRecords;
 
 class ListBookings extends ListRecords
@@ -15,12 +13,7 @@ class ListBookings extends ListRecords
     protected function getHeaderActions(): array
     {
         return [
-            CreateAction::make()
-                ->label('Новая запись')
-                ->icon('heroicon-o-plus'),  // Custom label for UX
+            Actions\CreateAction::make(),
         ];
     }
-
-    // Optional: Add tabs or custom widgets for dashboard-like view
-    // protected function getHeaderWidgets(): array { return [/* ... */]; }
 }
