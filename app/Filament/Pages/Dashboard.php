@@ -7,10 +7,14 @@ use App\Filament\Widgets\CalendarWidget;
 
 class Dashboard extends BaseDashboard
 {
-    protected function getHeaderWidgets(): array
+    public function getWidgets(): array
     {
         return [
-            CalendarWidget::class,
+            AccountWidget::class,
+            BookingStats::class,
+            LatestReviews::class,
+            PopularServices::class,
+            FilamentInfoWidget::class,
         ];
     }
 }

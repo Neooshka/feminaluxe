@@ -8,27 +8,258 @@
 @source '../../Livewire/**/*.php';
 @source '../../../../vendor/saade/filament-fullcalendar/resources/views/**/*.blade.php';
 
-/* Custom styles for calendar */
-.fc {
-    @apply bg-white rounded-lg shadow-md;
+
+/* ===== ОСНОВНЫЕ СТИЛИ ДЛЯ ТЕМНОЙ ТЕМЫ ===== */
+
+/* Фон всей страницы */
+.dark {
+    color-scheme: dark;
+    background-color: #111827; /* bg-gray-900 */
+    color: #f9fafb; /* text-gray-50 */
 }
 
-.fc .fc-toolbar {
-    @apply bg-gray-50 p-4 border-b;
+/* Компоненты Filament в темной теме */
+.dark .fi-section {
+    background-color: #1f2937 !important; /* bg-gray-800 */
+    border-color: #374151 !important; /* border-gray-700 */
+    color: #e5e7eb !important; /* text-gray-200 */
 }
 
-.fc .fc-toolbar-title {
-    @apply text-lg font-semibold text-gray-900;
+.dark .fi-card {
+    background-color: #1f2937 !important;
+    border-color: #374151 !important;
+    color: #e5e7eb !important;
 }
 
-.fc .fc-button {
-    @apply bg-primary-600 text-white hover:bg-primary-700;
+/* Таблицы в темной теме */
+.dark table {
+    background-color: #111827 !important; /* bg-gray-900 */
+    color: #e5e7eb !important; /* text-gray-200 */
+    border-color: #374151 !important; /* border-gray-700 */
 }
 
-.fc-event {
-    @apply cursor-pointer;
+.dark thead {
+    background-color: #374151 !important; /* bg-gray-700 */
 }
 
-.fc-event:hover {
-    @apply opacity-90;
+.dark th {
+    background-color: #374151 !important;
+    color: #f9fafb !important; /* text-gray-50 */
+    border-color: #4b5563 !important; /* border-gray-600 */
+}
+
+.dark td {
+    background-color: #1f2937 !important; /* bg-gray-800 */
+    color: #d1d5db !important; /* text-gray-300 */
+    border-color: #374151 !important; /* border-gray-700 */
+}
+
+.dark tr:hover td {
+    background-color: #374151 !important; /* bg-gray-700 */
+}
+
+/* Заголовки */
+.dark h1, .dark h2, .dark h3, .dark h4, .dark h5, .dark h6 {
+    color: #f9fafb !important; /* text-gray-50 */
+}
+
+.dark .text-gray-900 {
+    color: #f9fafb !important; /* text-gray-50 */
+}
+
+.dark .text-gray-700 {
+    color: #d1d5db !important; /* text-gray-300 */
+}
+
+.dark .text-gray-600 {
+    color: #9ca3af !important; /* text-gray-400 */
+}
+
+.dark .text-gray-500 {
+    color: #6b7280 !important; /* text-gray-500 */
+}
+
+/* Кнопки */
+.dark .fi-btn {
+    background-color: #374151 !important; /* bg-gray-700 */
+    color: #e5e7eb !important; /* text-gray-200 */
+    border-color: #4b5563 !important; /* border-gray-600 */
+}
+
+.dark .fi-btn:hover {
+    background-color: #4b5563 !important; /* bg-gray-600 */
+}
+
+.dark .fi-btn-primary {
+    background-color: #4f46e5 !important; /* bg-indigo-600 */
+    color: #ffffff !important;
+    border-color: #4f46e5 !important;
+}
+
+.dark .fi-btn-primary:hover {
+    background-color: #4338ca !important; /* bg-indigo-700 */
+}
+
+/* Badges */
+.dark .fi-badge {
+    background-color: #374151 !important; /* bg-gray-700 */
+    color: #e5e7eb !important; /* text-gray-200 */
+    border-color: #4b5563 !important; /* border-gray-600 */
+}
+
+/* Тени в темной теме */
+.dark .shadow {
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3), 0 1px 2px -1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.dark .shadow-lg {
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.3), 0 4px 6px -4px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* Градиенты и разделители */
+.dark .divide-gray-200 {
+    border-color: #374151 !important; /* divide-gray-700 */
+}
+
+.dark .border-gray-200 {
+    border-color: #374151 !important; /* border-gray-700 */
+}
+
+.dark .border-gray-300 {
+    border-color: #4b5563 !important; /* border-gray-600 */
+}
+
+/* Кастомные классы для твоего календаря */
+.dark .booking-calendar-grid {
+    background-color: #111827 !important; /* bg-gray-900 */
+}
+
+.dark .calendar-time-slot {
+    background-color: #1f2937 !important; /* bg-gray-800 */
+    color: #e5e7eb !important; /* text-gray-200 */
+    border-color: #374151 !important; /* border-gray-700 */
+}
+
+.dark .calendar-event {
+    background-color: #374151 !important; /* bg-gray-700 */
+    color: #f9fafb !important; /* text-gray-50 */
+}
+
+.dark .calendar-event.confirmed {
+    background-color: #065f46 !important; /* bg-green-900 */
+    color: #d1fae5 !important; /* text-green-200 */
+}
+
+.dark .calendar-event.pending {
+    background-color: #92400e !important; /* bg-amber-900 */
+    color: #fef3c7 !important; /* text-amber-200 */
+}
+
+.dark .calendar-event.cancelled {
+    background-color: #991b1b !important; /* bg-red-900 */
+    color: #fecaca !important; /* text-red-200 */
+}
+
+/* Статистика карточки */
+.dark .stat-card {
+    background-color: #1f2937 !important; /* bg-gray-800 */
+    color: #e5e7eb !important; /* text-gray-200 */
+}
+
+.dark .stat-value {
+    color: #f9fafb !important; /* text-gray-50 */
+}
+
+/* Легенда */
+.dark .legend-item {
+    color: #e5e7eb !important; /* text-gray-200 */
+}
+
+/* Инпут поля в темной теме */
+.dark input, .dark textarea, .dark select {
+    background-color: #1f2937 !important; /* bg-gray-800 */
+    color: #f9fafb !important; /* text-gray-50 */
+    border-color: #4b5563 !important; /* border-gray-600 */
+}
+
+.dark input:focus, .dark textarea:focus, .dark select:focus {
+    border-color: #6366f1 !important; /* border-indigo-500 */
+    ring-color: #6366f1 !important; /* ring-indigo-500 */
+}
+
+/* ===== КЛАССЫ ДЛЯ КАЛЕНДАРЯ ===== */
+.dark .calendar-container {
+    background-color: #111827 !important;
+}
+
+.dark .calendar-header {
+    background-color: #1f2937 !important;
+    color: #f9fafb !important;
+    border-color: #374151 !important;
+}
+
+.dark .calendar-body {
+    background-color: #111827 !important;
+}
+
+.dark .calendar-cell {
+    background-color: #1f2937 !important;
+    color: #e5e7eb !important;
+    border-color: #374151 !important;
+}
+
+.dark .calendar-cell:hover {
+    background-color: #374151 !important;
+}
+
+.dark .calendar-cell.today {
+    background-color: #1e40af !important; /* bg-blue-900 */
+    color: #dbeafe !important; /* text-blue-200 */
+}
+
+/* ===== ПЕРЕОПРЕДЕЛЕНИЕ ЦВЕТОВ ДЛЯ КОНКРЕТНЫХ ЭЛЕМЕНТОВ ===== */
+.dark .bg-white {
+    background-color: #1f2937 !important; /* bg-gray-800 */
+}
+
+.dark .bg-gray-50 {
+    background-color: #111827 !important; /* bg-gray-900 */
+}
+
+.dark .bg-gray-100 {
+    background-color: #1f2937 !important; /* bg-gray-800 */
+}
+
+.dark .bg-gray-200 {
+    background-color: #374151 !important; /* bg-gray-700 */
+}
+
+/* Цвета статусов для темной темы */
+.dark .text-green-600 {
+    color: #34d399 !important; /* text-green-400 */
+}
+
+.dark .text-amber-600 {
+    color: #fbbf24 !important; /* text-amber-400 */
+}
+
+.dark .text-red-600 {
+    color: #f87171 !important; /* text-red-400 */
+}
+
+.dark .bg-green-100 {
+    background-color: #064e3b !important; /* bg-green-900 */
+}
+
+.dark .bg-amber-100 {
+    background-color: #78350f !important; /* bg-amber-900 */
+}
+
+.dark .bg-red-100 {
+    background-color: #7f1d1d !important; /* bg-red-900 */
+}
+
+/* Тени для темной темы */
+.dark .shadow-gray-900 {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3), 0 2px 4px -2px rgba(0, 0, 0, 0.3) !important;
 }

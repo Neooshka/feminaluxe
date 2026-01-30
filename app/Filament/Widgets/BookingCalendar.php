@@ -16,6 +16,11 @@ class BookingCalendar extends FullCalendarWidget
 {
     public Model|string|null $model = Booking::class;
 
+    public static function canView(): bool
+    {
+        return false; // Виджет не будет отображаться
+    }
+
     public function getFormSchema(): array
     {
         return BookingResource::form(Schema::make())->getComponents();
@@ -78,9 +83,9 @@ class BookingCalendar extends FullCalendarWidget
             function({ event, el }) {
                 // Добавляем плавный hover и cursor-pointer
                 el.classList.add('transition', 'duration-150', 'hover:shadow-md', 'hover:scale-[1.02]', 'cursor-pointer');
-                
+
                 // Tooltip с дополнительной информацией
-                el.setAttribute('title', 
+                el.setAttribute('title',
                     event.title + '\\n' +
                     'Телефон: ' + (event.extendedProps.client_phone || '—') + '\\n' +
                     'Статус: ' + (event.extendedProps.status_label || '—')
@@ -99,7 +104,7 @@ class BookingCalendar extends FullCalendarWidget
             function(info) {
                 const event = info.event;
                 const timeText = info.timeText || '';
-                
+
                 let statusBadge = '';
                 if (event.extendedProps.status_label) {
                     let bgColor = '';
@@ -138,15 +143,11 @@ class BookingCalendar extends FullCalendarWidget
     {
         return [
             'initialView' => 'timeGridWeek',
-            'headerToolbar' => [
-                'left' => 'prev,next today',
-                'center' => 'title',
-                'right' => 'dayGridMonth,timeGridWeek,timeGridDay,listWeek',
-            ],
+            'allDaySlot' => false,
             'slotMinTime' => '09:00:00',
             'slotMaxTime' => '21:00:00',
-            'slotDuration' => '00:30:00',
-            'slotLabelInterval' => '00:30:00',
+            'slotDuration' => '01:00:00',
+            'slotLabelInterval' => '01:00:00',
             'selectable' => true,
             'selectMirror' => true,
             'editable' => true,
@@ -155,7 +156,8 @@ class BookingCalendar extends FullCalendarWidget
             'navLinks' => true,
             'weekends' => true,
             'locale' => 'ru',
-            'timeZone' => 'Europe/Amsterdam',
+            'firstDay' => 1,
+            'timeZone' => 'Europe/Moscow',
             'height' => 'auto',
             'contentHeight' => 'auto',
             'aspectRatio' => 1.8,
@@ -163,6 +165,19 @@ class BookingCalendar extends FullCalendarWidget
                 'daysOfWeek' => [1, 2, 3, 4, 5, 6],
                 'startTime' => '09:00',
                 'endTime' => '21:00',
+            ],
+            'buttonText' => [
+                'today' => 'Сегодня',
+                'month' => 'Месяц',
+                'week' => 'Неделя',
+                'day' => 'День',
+                'list' => 'Список',
+            ],
+            'slotLabelFormat' => [
+                'hour' => '2-digit',
+                'minute' => '2-digit',
+                'hour12' => false,
+                'meridiem' => false,
             ],
         ];
     }

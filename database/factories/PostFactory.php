@@ -22,7 +22,7 @@ class PostFactory extends Factory
         $title = $this->faker->unique()->sentence();
         return [
             'title' => $title,
-            'slug' => Str::slug($title),
+            'slug' => Str::random(25),
             'content' => $this->faker->paragraphs(5, true),
             'published_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
         ];

@@ -15,7 +15,9 @@ class CalendarBookings extends Page
     protected static string $resource = BookingResource::class;
 
     protected string $view = 'filament.resources.booking-resource.pages.calendar-bookings';
-
+    protected ?string $heading = 'Календарь бронирований';
+    protected ?string $subheading = 'Просмотр и управление записями в календарном виде';
+    protected static ?string $title = 'Календарь';
     protected function getHeaderActions(): array
     {
         return [
