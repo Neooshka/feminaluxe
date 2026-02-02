@@ -31,6 +31,7 @@ class Booking extends Model
         'utm_campaign',
         'utm_content',
         'utm_term',
+        'message',
     ];
 
     protected $casts = [
@@ -71,7 +72,7 @@ class Booking extends Model
 
     public function cancel(): void
     {
-        $this->update(['status' => 'cancelled']);
+    $this->update(['status' => 'cancelled']);
     }
     
     protected static function newFactory()

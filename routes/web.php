@@ -6,6 +6,7 @@ use App\Domains\Blog\Http\Controllers\PostController;
 use App\Domains\Bookings\Http\Controllers\BookingController;
 use App\Domains\Reviews\Http\Controllers\ReviewController;
 use App\Domains\Services\Http\Controllers\ServiceController;
+use App\Http\Controllers\MediaThumbnailController;
 use App\Domains\Services\Models\Service;
 use App\Http\Controllers\Api\SitemapController;
 use App\Http\Controllers\HomeController;
@@ -15,6 +16,12 @@ use Inertia\Inertia;
 use Tighten\Ziggy\Ziggy;
 
 Route::get('/', [HomeController::class, 'index'])->name('home');
+
+// Публичный доступ к миниатюрам
+Route::get('/media/{mediaId}/thumb/{type?}', [MediaThumbnailController::class, 'show'])
+    ->where('mediaId', '[0-9]+')
+    ->where('type', 'thumb|small|medium|square')
+    ->name('media.thumbnail');
 
 Route::prefix('services')->middleware(['throttle:60,1'])->name('services.')->group(function () {
     Route::get('/', [ServiceController::class, 'index'])->name('index');
@@ -28,7 +35,10 @@ Route::resource('blog', PostController::class)->only(['index', 'show'])->paramet
 
 Route::get('/portfolio', function () {
     $images = Service::with('media')->get()->flatMap(fn($s) => $s->getMedia('before_after')->map(fn($m) => [
-        'thumb' => $m->getUrl('thumb'),
+        'thumb' => route('media.thumbnail', [
+            'mediaId' => $m->id,
+            'type' => 'thumb'
+        ]),
         'full' => $m->getUrl(),
         'caption' => $s->name . ' - До/После',
     ]));
@@ -44,6 +54,9 @@ Route::get('/contact', function () {
 Route::get('/privacy', function () {
     return "Текст политки конфиденциальности";
 })->name('privacy');
+Route::get('/agreement', function () {
+    return "Текст пользовательского соглашения";
+})->name('agreement');
 
 // Бронирования
 Route::prefix('bookings')->middleware(['throttle:10,1'])->name('bookings.')->group(function () {
@@ -79,6 +92,3 @@ Route::middleware(['web'])->group(function () {
         );
     })->name('ziggy');
 });
-
-
-

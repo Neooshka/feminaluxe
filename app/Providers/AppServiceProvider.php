@@ -22,13 +22,5 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Schema::defaultStringLength(100);
-        Inertia::share([
-            'ziggy' => function () {
-                return [
-                    'routes' => app('router')->getRoutes()->getRoutesByName(),
-                    'url' => url('/'),
-                ];
-            },
-        ]);
     }
 }

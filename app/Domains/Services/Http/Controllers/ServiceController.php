@@ -197,17 +197,8 @@ class ServiceController extends Controller
                     'contraindications' => $service->contraindications ?? [],
                     'primary_image_url' => $service->primary_image_url,
                     'thumbnail_url' => $service->thumbnail_url,
-                    'images' => $service->getMedia('before_after')->map(fn($media) => [
-                        'thumb' => $media->getUrl('thumb'),
-                        'full' => $media->getUrl(),
-                        'medium' => $media->getUrl('medium'),
-                    ])->toArray(),
-                    'gallery_images' => $service->getMedia('gallery')->map(fn($media) => [
-                        'original' => $media->getUrl(),
-                        'thumbnail' => $media->getUrl('thumb'),
-                        'medium' => $media->getUrl('medium'),
-                        'alt' => $service->name,
-                    ])->toArray(),
+                    'images' => $service->images,
+                    'gallery_images' => $service->gallery_images,
                     'reviews' => $service->reviews->map(fn($review) => [
                         'id' => $review->id,
                         'author' => $review->author,
@@ -595,7 +586,7 @@ class ServiceController extends Controller
      */
     private function generateCategorySeoData(string $category, array $services): array
     {
-        $title = "{$category} - Услуги перманентного макияжа в Москве | Feminaluxe";
+        $title = "{$category} - Услуги перманентного макияжа в Балашихе | Feminaluxe";
 
         // Find minimum price
         $minPrice = min(array_column($services, 'final_price'));

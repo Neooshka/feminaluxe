@@ -12,6 +12,7 @@ use App\Jobs\SendBookingSms;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Validation\Rule;
 use Inertia\Inertia;
 use Inertia\Response;
@@ -148,10 +149,11 @@ class BookingController extends Controller
             $this->trackBookingEvent($booking);
         }
 
-        return redirect()->route('bookings.success', [
+        $redirectUrl = URL::signedRoute('bookings.success', [
             'booking' => $booking->id,
-            'token' => sha1($booking->id . $booking->created_at)
         ]);
+        
+        return redirect()->to($redirectUrl);
     }
 
     /**
@@ -223,13 +225,7 @@ class BookingController extends Controller
      * Success page after booking
      */
     public function success(Request $request, Booking $booking): Response
-    {
-        // Проверяем, что пользователь имеет доступ к этой брони
-        if ($request->session()->get('booking_id') !== $booking->id &&
-            !$request->hasValidSignature()) {
-            abort(403);
-        }
-
+    {xdebug_break();
         return Inertia::render('Booking/Success', [
             'booking' => $booking->load('service'),
             'meta' => [

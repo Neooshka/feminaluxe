@@ -47,7 +47,7 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                       d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                             </svg>
-                            <span class="font-semibold">+7 (495) 123-45-67</span>
+                            <span class="font-semibold">{{ pageProps.config.contact.phone }}</span>
                         </a>
                         <Link
                             :href="route('bookings.create')"
@@ -150,19 +150,11 @@
                             </div>
                         </Link>
                         <p class="text-white/80 mb-6 max-w-lg">
-                            Студия профессионального перманентного макияжа в Москве.
+                            Студия профессионального перманентного макияжа в Балашихе.
                             Мы создаем естественную красоту, которая сохраняется годами.
                         </p>
                         <div class="flex space-x-4">
-                            <a href="#"
-                               class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
-                                <span class="sr-only">Instagram</span>
-                                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                                    <path
-                                        d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
-                                </svg>
-                            </a>
-                            <a href="#"
+                            <a :href="`https://vk.com/${pageProps.config.contact.vk}`"
                                class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
                                 <span class="sr-only">VK</span>
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -170,7 +162,7 @@
                                         d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 12.75 3.802 9.944 3.802 9.944c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.677.863 2.49 2.303 4.675 2.896 4.675.22 0 .322-.102.322-.66V9.964c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.744c.373 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.254-1.406 2.151-3.574 2.151-3.574.119-.254.305-.491.762-.491h1.744c.525 0 .644.271.525.643-.22.73-2.354 4.065-2.354 4.065-.186.305-.254.44 0 .78.186.254.796.78 1.203 1.253.746.847 1.32 1.558 1.473 2.05.17.525-.085.795-.576.795z"/>
                                 </svg>
                             </a>
-                            <a href="#"
+                           <a :href="`https://t.me/${pageProps.config.contact.vk}`"
                                class="w-10 h-10 bg-white/20 hover:bg-white/30 rounded-full flex items-center justify-center transition-colors">
                                 <span class="sr-only">Telegram</span>
                                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
@@ -208,7 +200,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                                 </svg>
-                                <span class="text-white/80">Москва, ул. Красоты, 10</span>
+                                <span class="text-white/80">{{ pageProps.config.contact.address }}</span>
                             </div>
                             <div class="flex items-center space-x-3">
                                 <svg class="w-5 h-5 text-white/90 flex-shrink-0" fill="none" stroke="currentColor"
@@ -217,7 +209,7 @@
                                           d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
                                 </svg>
                                 <a href="tel:+74951234567" class="text-white/80 hover:text-white transition-colors">
-                                    +7 (495) 123-45-67
+                                    {{ pageProps.config.contact.phone }}
                                 </a>
                             </div>
                             <div class="flex items-center space-x-3">
@@ -226,7 +218,7 @@
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                                           d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
                                 </svg>
-                                <span class="text-white/80">Ежедневно с 9:00 до 21:00</span>
+                                <span class="text-white/80">{{ pageProps.config.contact.hours }}</span>
                             </div>
                         </div>
                     </div>
@@ -234,12 +226,12 @@
 
                 <!-- Копирайт -->
                 <div class="border-t border-white/20 mt-8 pt-8 text-center text-white/60 text-sm">
-                    <p>&copy; 2025 Feminaluxe. Все права защищены.</p>
+                    <p>&copy; {{ currentYear }} Feminaluxe. Все права защищены.</p>
                     <p class="mt-2">
-                        <Link :href="'#'" class="hover:text-white/80 transition-colors">Политика конфиденциальности
+                        <Link :href="route('privacy')" class="hover:text-white/80 transition-colors">Политика конфиденциальности
                         </Link>
                         <span class="mx-2">•</span>
-                        <Link :href="'#'" class="hover:text-white/80 transition-colors">Пользовательское соглашение
+                        <Link :href="route('agreement')" class="hover:text-white/80 transition-colors">Пользовательское соглашение
                         </Link>
                     </p>
                 </div>
@@ -249,12 +241,13 @@
 </template>
 
 <script setup>
-import {Link} from '@inertiajs/vue3';
+import {Link, usePage} from '@inertiajs/vue3';
 import {ref, computed} from 'vue';
 import {route} from "ziggy-js";
 
 const isMenuOpen = ref(false);
 const isScrolled = ref(false);
+const currentYear = ref(new Date().getFullYear())
 
 // Навигационные пункты
 const navItems = [
@@ -264,6 +257,8 @@ const navItems = [
     {name: 'Блог', href: route('blog.index')},
     {name: 'Контакты', href: route('contact')},
 ];
+
+const { props: pageProps } = usePage();
 
 // Обработка скролла для изменения хедера
 if (typeof window !== 'undefined') {

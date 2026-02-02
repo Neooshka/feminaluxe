@@ -71,7 +71,7 @@ class ServiceSeoService
 
     public function getIndexTitle(): string
     {
-        return 'Услуги перманентного макияжа бровей, губ и межресничек в Москве | Feminaluxe';
+        return 'Услуги перманентного макияжа бровей, губ и межресничек в Балашихе | Feminaluxe';
     }
 
     public function getIndexDescription(): string
@@ -86,7 +86,7 @@ class ServiceSeoService
             'татуаж бровей',
             'татуаж губ',
             'межресничный перманент',
-            'пудровые брови Москва',
+            'пудровые брови Балашиха',
             'акварельные губы',
             'коррекция татуажа',
             'удаление татуажа лазером',
@@ -96,7 +96,7 @@ class ServiceSeoService
 
     public function getShowTitle(array $service): string
     {
-        return sprintf('%s - цена %s руб. | Перманентный макияж в Москве | Feminaluxe',
+        return sprintf('%s - цена %s руб. | Перманентный макияж в Балашихе | Feminaluxe',
             $service['name'],
             number_format($service['final_price'], 0, '', ' ')
         );
@@ -123,11 +123,11 @@ class ServiceSeoService
                 'name' => 'Feminaluxe',
                 'address' => [
                     '@type' => 'PostalAddress',
-                    'addressLocality' => 'Москва',
-                    'postalCode' => '123456',
-                    'streetAddress' => 'ул. Примерная, д. 1',
+                    'addressLocality' => 'Балашиха',
+                    'postalCode' => '143914',
+                    'streetAddress' => config('app.contact.address'),
                 ],
-                'telephone' => '+7 (495) 123-45-67',
+                'telephone' => config('app.contact.phone'),
                 'priceRange' => '$$$',
             ],
             'name' => $service['name'],

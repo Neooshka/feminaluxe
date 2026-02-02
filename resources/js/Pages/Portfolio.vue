@@ -18,7 +18,7 @@ const props = defineProps({
         <p class="text-xl text-center mb-16 text-gray-700">Реальные результаты: фото до и после. Убедитесь в качестве!</p>
         <div class="columns-1 sm:columns-2 md:columns-3 lg:columns-4 gap-4 space-y-4">
           <div v-for="(image, index) in images" :key="index" class="break-inside-avoid relative group overflow-hidden rounded-lg shadow-md">
-            <img :src="image.thumb" alt="Портфолио {{ image.caption }}" class="w-full h-auto transition-transform duration-300 group-hover:scale-110" loading="lazy">
+            <img :src="image.thumb" :alt="`Портфолио ${image.caption}`" class="w-full h-auto transition-transform duration-300 group-hover:scale-110" loading="lazy">
             <div class="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
               <p class="text-white text-center font-semibold px-4">{{ image.caption }}</p>
             </div>

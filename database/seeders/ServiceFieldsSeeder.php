@@ -139,7 +139,7 @@ class ServiceFieldsSeeder extends Seeder
     private function generateMetaDescription(Service $service): string
     {
         return sprintf(
-            '%s по доступной цене. Профессиональный перманентный макияж в Москве. ✅ Гарантия качества ✅ Опытные мастера ✅ Запишитесь онлайн!',
+            '%s по доступной цене. Профессиональный перманентный макияж в Балашихе. ✅ Гарантия качества ✅ Опытные мастера ✅ Запишитесь онлайн!',
             $service->name
         );
     }

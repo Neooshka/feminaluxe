@@ -2,7 +2,6 @@
 
 namespace App\Domains\Services\Models;
 
-use Database\Factories\ServiceFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
@@ -10,6 +9,7 @@ use Spatie\MediaLibrary\HasMedia;
 use Spatie\MediaLibrary\InteractsWithMedia;
 use App\Domains\Bookings\Models\Booking;
 use App\Domains\Reviews\Models\Review;
+use Spatie\MediaLibrary\MediaCollections\Models\Media;
 
 class Service extends Model implements HasMedia
 {
@@ -187,7 +187,7 @@ class Service extends Model implements HasMedia
      */
     public function getPrimaryImageUrlAttribute(): ?string
     {
-        $media = $this->getFirstMedia('before_after');
+        $media = $this->getFirstMedia('gallery');
         return $media ? $media->getUrl() : null;
     }
 
@@ -196,7 +196,7 @@ class Service extends Model implements HasMedia
      */
     public function getThumbnailUrlAttribute(): ?string
     {
-        $media = $this->getFirstMedia('before_after');
+        $media = $this->getFirstMedia('gallery');
         return $media ? $media->getUrl('thumb') : null;
     }
 
@@ -209,6 +209,7 @@ class Service extends Model implements HasMedia
             return [
                 'original' => $media->getUrl(),
                 'thumbnail' => $media->getUrl('thumb'),
+                'thumb' => $media->getUrl('thumb'),
                 'medium' => $media->getUrl('medium'),
                 'alt' => $this->name,
             ];
@@ -267,9 +268,55 @@ class Service extends Model implements HasMedia
 
         return self::where('slug', $identifier)->first();
     }
-    
-    protected static function newFactory()
+
+    public function registerMediaConversions(Media $media = null): void
     {
-        return ServiceFactory::new();
+        $this->addMediaConversion('thumb')
+        ->width(150)
+            ->height(150)
+            ->sharpen(10)
+            ->optimize()
+            ->performOnCollections('before_after', 'gallery');
+
+        $this->addMediaConversion('medium')
+            ->width(800)
+            ->height(600)
+            ->sharpen(10)
+            ->optimize()
+            ->performOnCollections('gallery');
+
+        $this->addMediaConversion('large')
+            ->width(1920)
+            ->height(1080)
+            ->sharpen(10)
+            ->optimize()
+            ->performOnCollections('before_after');
+    }
+
+    public function getImagesAttribute()
+    {
+        $beforeAfter = $this->getMedia('before_after');
+        $gallery = $this->getMedia('gallery');
+
+        return $beforeAfter->merge($gallery)->map(function ($media) {
+            return [
+                'id' => $media->id,
+                'thumb' => route('media.thumbnail', [
+                    'mediaId' => $media->id,
+                    'type' => 'thumb'
+                ]),
+                'small' => route('media.thumbnail', [
+                    'mediaId' => $media->id,
+                    'type' => 'small'
+                ]),
+                'medium' => route('media.thumbnail', [
+                    'mediaId' => $media->id,
+                    'type' => 'medium'
+                ]),
+                'full' => $media->getUrl(),
+                'alt' => $this->name,
+                'collection' => $media->collection_name,
+            ];
+        })->toArray();
     }
 }

@@ -21,7 +21,7 @@ class ReviewService
         return Cache::remember($cacheKey, 3600, function () use ($filters) {
             $query = Review::query()
                 ->with(['service' => function ($query) {
-                    $query->select('id', 'name', 'slug', 'primary_image_url');
+                    $query->select('id', 'name', 'slug');
                 }])
                 ->approved()
                 ->latest();
@@ -72,7 +72,8 @@ class ReviewService
     {
         return Cache::remember('reviews_stats', 1800, function () {
             $total = Review::approved()->count();
-            $average = round(Review::approved()->avg('rating') ?? 0, 1);
+            $avg = (float) Review::approved()->avg('rating') ?? 0;
+            $average = round($avg, 1);
 
             $ratingDistribution = [];
             for ($i = 5; $i >= 1; $i--) {

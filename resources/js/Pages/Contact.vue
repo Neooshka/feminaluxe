@@ -1,12 +1,13 @@
 <script setup>
-import {useForm} from '@inertiajs/vue3';
-import {Head, Link} from '@inertiajs/vue3';
+import {Head, Link, useForm, usePage} from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {route} from "ziggy-js";
 
 const props = defineProps({
     services: Array,
 });
+
+const { props: pageProps } = usePage();
 
 const form = useForm({
     service_id: null,
@@ -108,9 +109,9 @@ const submit = () => {
                     <p v-if="form.processing" class="text-center mt-4 text-gray-600">Обработка записи...</p>
                 </div>
                 <div class="text-center mt-12 text-gray-700">
-                    <p>Адрес: Москва, ул. Красоты, 10</p>
-                    <p>Телефон: +7 (495) 123-45-67</p>
-                    <p>Email: info@feminaluxe.com</p>
+                    <p>Адрес: {{ pageProps.config.contact.address }}</p>
+                    <p>Телефон: {{ pageProps.config.contact.phone }}</p>
+                    <p>Email: {{ pageProps.config.contact.email }}</p>
                 </div>
             </div>
         </section>

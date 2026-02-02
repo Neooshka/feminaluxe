@@ -68,6 +68,8 @@ class AdminPanelProvider extends PanelProvider
                 Authenticate::class,
             ])
             ->viteTheme('resources/css/filament/admin/theme.css')
-            ->plugin(FilamentFullCalendarPlugin::make());
+            ->plugins([
+                FilamentFullCalendarPlugin::make(),
+            ]);
     }
 }

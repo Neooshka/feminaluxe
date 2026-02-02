@@ -9,10 +9,12 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Schema;
 use Filament\Schemas\Components\Section;
+use Filament\Schemas\Components\Group;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -32,129 +34,146 @@ class ServiceResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make('Основная информация')
-                    ->schema([
-                        Forms\Components\TextInput::make('name')
-                            ->label('Название')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                $set('slug', Str::slug($state));
-                            }),
+                Group::make()->schema([
+                    Section::make('Основная информация')
+                        ->schema([
+                            Forms\Components\TextInput::make('name')
+                                ->label('Название')
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function ($state, callable $set) {
+                                    $set('slug', Str::slug($state));
+                                })
+                                ->columnSpan(3),
 
-                        Forms\Components\TextInput::make('slug')
-                            ->label('URL-адрес')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true)
-                            ->helperText('Уникальный идентификатор для URL'),
+                            Forms\Components\TextInput::make('category')
+                                ->label('Категория')
+                                ->required()
+                                ->maxLength(100)
+                                ->columnSpan(2),
 
-                        Forms\Components\TextInput::make('category')
-                            ->label('Категория')
-                            ->required()
-                            ->maxLength(100),
+                            Forms\Components\TextInput::make('slug')
+                                ->label('URL-адрес')
+                                ->required()
+                                ->maxLength(255)
+                                ->unique(ignoreRecord: true)
+                                ->helperText('Уникальный идентификатор для URL')
+                                ->columnSpanFull(),
 
-                        Forms\Components\Toggle::make('is_popular')
-                            ->label('Популярная услуга')
-                            ->default(false),
+                            Forms\Components\Toggle::make('is_active')
+                                ->label('Активна')
+                                ->default(true)
+                                ->columnSpan(3),
 
-                        Forms\Components\Toggle::make('is_active')
-                            ->label('Активна')
-                            ->default(true),
-                    ])->columns(2),
+                            Forms\Components\Toggle::make('is_popular')
+                                ->label('Популярная услуга')
+                                ->default(false)
+                                ->columnSpan(2),
+                        ])->columns(5),
 
-                Section::make('Описания')
-                    ->schema([
-                        Forms\Components\Textarea::make('short_description')
-                            ->label('Краткое описание')
-                            ->rows(3)
-                            ->maxLength(500)
-                            ->helperText('Для карточек и превью'),
+                    Section::make('Цены и длительность')
+                        ->schema([
+                            Forms\Components\TextInput::make('price')
+                                ->label('Цена')
+                                ->numeric()
+                                ->required()
+                                ->prefix('₽')
+                                ->step(0.01),
 
-                        Forms\Components\RichEditor::make('description')
-                            ->label('Описание')
-                            ->required()
-                            ->columnSpanFull(),
+                            Forms\Components\TextInput::make('discounted_price')
+                                ->label('Цена со скидкой')
+                                ->numeric()
+                                ->prefix('₽')
+                                ->step(0.01)
+                                ->helperText('Оставьте пустым, если скидки нет'),
 
-                        Forms\Components\RichEditor::make('detailed_description')
-                            ->label('Детальное описание')
-                            ->columnSpanFull(),
-                    ]),
+                            Forms\Components\TextInput::make('duration')
+                                ->label('Длительность')
+                                ->maxLength(50)
+                                ->helperText('Например: "2-3 часа"'),
 
-                Section::make('Цены и длительность')
-                    ->schema([
-                        Forms\Components\TextInput::make('price')
-                            ->label('Цена')
-                            ->numeric()
-                            ->required()
-                            ->prefix('₽')
-                            ->step(0.01),
+                            Forms\Components\Toggle::make('has_promotion')
+                                ->label('Акция')
+                                ->reactive()
+                                ->helperText('Включить отображение акции'),
 
-                        Forms\Components\TextInput::make('discounted_price')
-                            ->label('Цена со скидкой')
-                            ->numeric()
-                            ->prefix('₽')
-                            ->step(0.01)
-                            ->helperText('Оставьте пустым, если скидки нет'),
+                            Forms\Components\DateTimePicker::make('featured_until')
+                                ->label('Акция действует до')
+                                ->hidden(fn ($get) => !$get('has_promotion')),
+                        ])->columns(2),
 
-                        Forms\Components\TextInput::make('duration')
-                            ->label('Длительность')
-                            ->maxLength(50)
-                            ->helperText('Например: "2-3 часа"'),
+                    Section::make('Изображения')
+                        ->schema([
+                            SpatieMediaLibraryFileUpload::make('before_after')
+                                ->label('Фото до/после')
+                                ->disk('media')
+                                ->collection('before_after')
+                                ->image()
+                                ->directory('services/before-after')
+                                ->maxSize(10240)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->helperText('Основное фото услуги')
+                                ->conversion('thumb')
+                                ->responsiveImages()
+                                ->multiple(false)
+                                ->reorderable(true),
 
-                        Forms\Components\Toggle::make('has_promotion')
-                            ->label('Акция')
-                            ->reactive()
-                            ->helperText('Включить отображение акции'),
+                            SpatieMediaLibraryFileUpload::make('gallery')
+                                ->label('Галерея')
+                                ->disk('media')
+                                ->collection('gallery')
+                                ->image()
+                                ->directory('services/gallery')
+                                ->multiple()
+                                ->maxFiles(10)
+                                ->reorderable()
+                                ->maxSize(10240)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->helperText('Дополнительные фото услуги')
+                                ->responsiveImages()
+                                ->conversion('thumb'),
+                        ]),
+                ])->columns(1),
+                Group::make()->schema([
+                    Section::make('Описания')
+                        ->schema([
+                            Forms\Components\Textarea::make('short_description')
+                                ->label('Краткое описание')
+                                ->rows(3)
+                                ->maxLength(500)
+                                ->helperText('Для карточек и превью'),
 
-                        Forms\Components\DateTimePicker::make('featured_until')
-                            ->label('Акция действует до')
-                            ->hidden(fn ($get) => !$get('has_promotion')),
-                    ])->columns(2),
+                            Forms\Components\RichEditor::make('description')
+                                ->label('Описание')
+                                ->required()
+                                ->columnSpanFull(),
 
-                Section::make('Дополнительно')
-                    ->schema([
-                        Forms\Components\TextInput::make('sort_order')
-                            ->label('Порядок сортировки')
-                            ->numeric()
-                            ->default(0),
+                            Forms\Components\RichEditor::make('detailed_description')
+                                ->label('Детальное описание')
+                                ->columnSpanFull(),
+                        ]),
 
-                        Forms\Components\DateTimePicker::make('published_at')
-                            ->label('Дата публикации')
-                            ->default(now()),
+                    Section::make('Дополнительно')
+                        ->schema([
+                            Forms\Components\TextInput::make('sort_order')
+                                ->label('Порядок сортировки')
+                                ->numeric()
+                                ->default(0),
 
-                        Forms\Components\KeyValue::make('benefits')
-                            ->label('Преимущества')
-                            ->keyLabel('Заголовок')
-                            ->valueLabel('Описание'),
+                            Forms\Components\DateTimePicker::make('published_at')
+                                ->label('Дата публикации')
+                                ->default(now()),
 
-                        Forms\Components\KeyValue::make('contraindications')
-                            ->label('Противопоказания'),
-                    ])->columns(2),
+                            Forms\Components\KeyValue::make('benefits')
+                                ->label('Преимущества')
+                                ->keyLabel('Заголовок')
+                                ->valueLabel('Описание'),
 
-                Section::make('Изображения')
-                    ->schema([
-                        Forms\Components\FileUpload::make('before_after')
-                            ->label('Фото до/после')
-                            ->collection('before_after')
-                            ->image()
-                            ->directory('services/before-after')
-                            ->maxSize(10240)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->helperText('Основное фото услуги'),
-
-                        Forms\Components\FileUpload::make('gallery')
-                            ->label('Галерея')
-                            ->collection('gallery')
-                            ->image()
-                            ->directory('services/gallery')
-                            ->multiple()
-                            ->reorderable()
-                            ->maxSize(10240)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->helperText('Дополнительные фото услуги'),
-                    ]),
+                            Forms\Components\KeyValue::make('contraindications')
+                                ->label('Противопоказания'),
+                        ])->columns(2),
+                ])->columns(1),
             ]);
     }
 

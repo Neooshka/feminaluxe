@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ServiceCard from '@/Components/ServiceCard.vue';
 import { ChevronRightIcon, SparklesIcon, ShieldCheckIcon, ClockIcon } from '@heroicons/vue/24/outline';
@@ -11,6 +11,8 @@ const props = defineProps({
   popular_services: Array, // Популярные услуги
   meta: Object        // SEO-метаданные от ServiceSeoService
 });
+
+const { props: pageProps } = usePage();
 
 // 3. ПРОСТАЯ логика группировки для отображения.
 //    Услуги уже пришли отсортированными по category из контроллера.
@@ -52,7 +54,7 @@ const displayServices = () => {
       <div class="container mx-auto px-4 relative z-10">
         <div class="max-w-4xl mx-auto text-center">
           <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-            Услуги <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600">перманентного макияжа</span> в Москве
+            Услуги <span class="text-transparent bg-clip-text bg-gradient-to-r from-rose-600 to-purple-600">перманентного макияжа</span> в Балашихе
           </h1>
           <p class="text-lg md:text-xl text-gray-700 mb-10 max-w-3xl mx-auto">
             Профессиональный татуаж бровей, губ и межресничного пространства от мастеров с медицинским образованием.
@@ -175,11 +177,11 @@ const displayServices = () => {
                 Записаться онлайн
               </Link>
               <a
-                href="https://wa.me/79991234567"
+                :href="`https://t.me/${pageProps.config.contact.telegram}`"
                 target="_blank"
                 class="px-8 py-4 bg-transparent border-2 border-white text-white font-bold rounded-full hover:bg-white/10 transition-all duration-300"
               >
-                Написать в WhatsApp
+                Написать в Telegram
               </a>
             </div>
             <p class="mt-6 text-sm opacity-75">

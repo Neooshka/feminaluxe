@@ -152,4 +152,13 @@ return [
 //        App\Providers\EventServiceProvider::class,
 //        App\Providers\RouteServiceProvider::class,
     ],
+    
+    'contact' => [
+        'email' => env('CONTACT_EMAIL', 'info@feminaluxe.ru'),
+        'phone' => env('CONTACT_PHONE', '+7 (495) 123-45-67'),
+        'address' => env('CONTACT_ADDRESS', 'Москва, ул. Красоты, 10'),
+        'hours' => env('CONTACT_HOURS', 'Ежедневно с 9:00 до 21:00'),
+        'vk' => env('CONTACT_VK', 'feminaluxe'),
+        'telegram' => env('CONTACT_TELEGRAM', 'feminaluxe'),
+    ],
 ];

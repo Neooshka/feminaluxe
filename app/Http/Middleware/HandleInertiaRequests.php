@@ -23,15 +23,20 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user(),
             ],
-            'ziggy' => fn () => array_merge(
-                (new Ziggy)->toArray(),
-                ['location' => $request->url()]
-            ),
+            'ziggy' => function () {
+                return [
+                    'routes' => app('router')->getRoutes()->getRoutesByName(),
+                    'url' => url('/'),
+                ];
+            },
             'flash' => [
                 'success' => fn () => $request->session()->get('success'),
             ],
             // Optional: Share seo array for Vue Head if client-side dynamic needed (e.g., SPA navigation)
             'seo' => fn () => $request->get('SEOData')?->toArray() ?? [],  // From controller withViewData
+            'config' => [
+                'contact' => config('app.contact'),
+            ],
         ]);
     }
 }

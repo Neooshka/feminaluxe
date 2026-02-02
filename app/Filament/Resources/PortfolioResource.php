@@ -11,8 +11,10 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Form;
+use Filament\Schemas\Components\Group;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Filament\Tables;
@@ -34,93 +36,99 @@ class PortfolioResource extends Resource
     {
         return $schema
             ->schema([
-                Section::make('Основная информация')
-                    ->schema([
-                        Forms\Components\TextInput::make('title')
-                            ->label('Название работы')
-                            ->required()
-                            ->maxLength(255)
-                            ->live(onBlur: true)
-                            ->afterStateUpdated(function ($state, callable $set) {
-                                $set('slug', Str::slug($state));
-                            }),
-
-                        Forms\Components\TextInput::make('slug')
-                            ->label('URL-адрес')
-                            ->required()
-                            ->maxLength(255)
-                            ->unique(ignoreRecord: true)
-                            ->helperText('Уникальный идентификатор для URL'),
-
-                        Forms\Components\Select::make('service_id')
-                            ->label('Услуга')
-                            ->relationship('service', 'name')
-                            ->searchable()
-                            ->preload()
-                            ->required(),
-
-                        Forms\Components\Textarea::make('description')
-                            ->label('Описание')
-                            ->rows(3)
-                            ->maxLength(1000),
-
-                        Forms\Components\TextInput::make('sort_order')
-                            ->label('Порядок сортировки')
-                            ->numeric()
-                            ->default(0),
-
-                        Forms\Components\Toggle::make('is_published')
-                            ->label('Опубликовано')
-                            ->default(false),
-
-                        Forms\Components\DateTimePicker::make('published_at')
-                            ->label('Дата публикации')
-                            ->default(now()),
-                    ])->columns(2),
-
-                Section::make('Фотографии')
-                    ->schema([
-                        Forms\Components\FileUpload::make('before')
-                            ->label('Фото "До"')
-                            ->collection('before')
-                            ->image()
-                            ->directory('portfolio/before')
-                            ->maxSize(10240)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->helperText('Фото до процедуры'),
-
-                        Forms\Components\FileUpload::make('after')
-                            ->label('Фото "После"')
-                            ->collection('after')
-                            ->image()
-                            ->directory('portfolio/after')
-                            ->maxSize(10240)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->helperText('Фото после процедуры'),
-
-                        Forms\Components\FileUpload::make('gallery')
-                            ->label('Дополнительные фото')
-                            ->collection('gallery')
-                            ->image()
-                            ->directory('portfolio/gallery')
-                            ->multiple()
-                            ->reorderable()
-                            ->maxSize(10240)
-                            ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
-                            ->helperText('Дополнительные фотографии работы'),
-                    ]),
-
-                Section::make('SEO')
-                    ->schema([
-                        Forms\Components\Textarea::make('seo.description')
-                            ->label('Meta Description')
-                            ->rows(3)
-                            ->maxLength(160),
-
-                        Forms\Components\TextInput::make('seo.title')
-                            ->label('Meta Title')
-                            ->maxLength(60),
-                    ]),
+                Group::make()->schema([
+                    Section::make('Основная информация')
+                        ->schema([
+                            Forms\Components\TextInput::make('title')
+                                ->label('Название работы')
+                                ->required()
+                                ->maxLength(255)
+                                ->live(onBlur: true)
+                                ->afterStateUpdated(function ($state, callable $set) {
+                                    $set('slug', Str::slug($state));
+                                }),
+    
+                            Forms\Components\TextInput::make('slug')
+                                ->label('URL-адрес')
+                                ->required()
+                                ->maxLength(255)
+                                ->unique(ignoreRecord: true)
+                                ->helperText('Уникальный идентификатор для URL'),
+    
+                            Forms\Components\Select::make('service_id')
+                                ->label('Услуга')
+                                ->relationship('service', 'name')
+                                ->searchable()
+                                ->preload()
+                                ->required(),
+    
+                            Forms\Components\Textarea::make('description')
+                                ->label('Описание')
+                                ->rows(3)
+                                ->maxLength(1000),
+    
+                            Forms\Components\TextInput::make('sort_order')
+                                ->label('Порядок сортировки')
+                                ->numeric()
+                                ->default(0),
+    
+                            Forms\Components\Toggle::make('is_published')
+                                ->label('Опубликовано')
+                                ->default(false),
+    
+                            Forms\Components\DateTimePicker::make('published_at')
+                                ->label('Дата публикации')
+                                ->default(now()),
+                        ])->columns(2),
+    
+                    Section::make('SEO')
+                        ->schema([
+                            Forms\Components\Textarea::make('seo.description')
+                                ->label('Meta Description')
+                                ->rows(3)
+                                ->maxLength(160),
+    
+                            Forms\Components\TextInput::make('seo.title')
+                                ->label('Meta Title')
+                                ->maxLength(60),
+                        ]),
+                ])->columns(1),
+                Group::make()->schema([
+                    Section::make('Фотографии')
+                        ->schema([
+                            SpatieMediaLibraryFileUpload::make('before')
+                                ->label('Фото "До"')
+                                ->disk('media')
+                                ->collection('before')
+                                ->image()
+                                ->directory('portfolio/before')
+                                ->maxSize(10240)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->helperText('Фото до процедуры'),
+    
+                            SpatieMediaLibraryFileUpload::make('after')
+                                ->label('Фото "После"')
+                                ->disk('media')
+                                ->collection('after')
+                                ->image()
+                                ->directory('portfolio/after')
+                                ->maxSize(10240)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->helperText('Фото после процедуры'),
+    
+                            SpatieMediaLibraryFileUpload::make('gallery')
+                                ->label('Дополнительные фото')
+                                ->disk('media')
+                                ->collection('gallery')
+                                ->image()
+                                ->directory('portfolio/gallery')
+                                ->multiple()
+                                ->reorderable()
+                                ->maxSize(10240)
+                                ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
+                                ->helperText('Дополнительные фотографии работы'),
+                        ]),
+                ])->columns(1),
             ]);
     }
 
@@ -189,7 +197,7 @@ class PortfolioResource extends Resource
                 Action::make('view')
                     ->label('Посмотреть')
                     ->icon('heroicon-o-eye')
-                    ->url(fn (Portfolio $record) => route('portfolio.show', [$record]))
+                    ->url(fn (Portfolio $record) => route('portfolio', [$record]))
                     ->openUrlInNewTab()
                     ->visible(fn (Portfolio $record) => $record->is_published),
 

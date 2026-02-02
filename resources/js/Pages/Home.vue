@@ -1,5 +1,5 @@
 <script setup>
-import {Head, Link} from '@inertiajs/vue3';
+import {Head, Link, usePage} from '@inertiajs/vue3';
 import {ref, onMounted, computed} from 'vue';
 import {route} from "ziggy-js";
 import AppLayout from '@/Layouts/AppLayout.vue';
@@ -12,12 +12,14 @@ const props = defineProps({
     categories: Array,
 });
 
+const { props: pageProps } = usePage();
+
 const activeCategory = ref('all');
 const stats = ref([
     {value: '1000+', label: 'Довольных клиенток', icon: '😊'},
-    {value: '5 лет', label: 'Опыта работы', icon: '⭐'},
-    {value: '98%', label: 'Положительных отзывов', icon: '❤️'},
-    {value: '24/7', label: 'Поддержка клиентов', icon: '📱'},
+    {value: '9 лет', label: 'Опыта работы', icon: '⭐'},
+    {value: '96%', label: 'Положительных отзывов', icon: '❤️'},
+    {value: '100%', label: 'Поддержка клиентов', icon: '📱'},
 ]);
 
 // Категории услуг
@@ -63,11 +65,11 @@ onMounted(() => {
 
 <template>
     <Head>
-        <title>Feminaluxe: Перманентный макияж бровей, губ и межресничек в Москве</title>
+        <title>Feminaluxe: Перманентный макияж бровей, губ и межресничек в Балашихе</title>
         <meta name="description"
               content="Профессиональный перманентный макияж – естественная красота на годы. Пудровое напыление бровей, акварельный татуаж губ, межресничный перманент. Запишитесь онлайн!"/>
         <!-- Open Graph теги -->
-        <meta property="og:title" content="Feminaluxe: Перманентный макияж премиум-класса в Москве"/>
+        <meta property="og:title" content="Feminaluxe: Перманентный макияж премиум-класса в Балашихе"/>
         <meta property="og:description"
               content="Профессиональный перманентный макияж – естественная красота на годы. Пудровое напыление бровей, акварельный татуаж губ, межресничный перманент."/>
         <meta property="og:image" content="/images/og-image.jpg"/>
@@ -80,14 +82,14 @@ onMounted(() => {
                 "@context": "https://schema.org",
                 "@type": "BeautySalon",
                 "name": "Feminaluxe",
-                "description": "Студия перманентного макияжа премиум-класса в Москве",
+                "description": "Студия перманентного макияжа премиум-класса в Балашихе",
                 "url": "{{ route('home') }}",
-                "telephone": "+7 (495) 123-45-67",
+                "telephone": "{{ pageProps.config.contact.phone }}",
                 "address": {
                     "@type": "PostalAddress",
-                    "streetAddress": "ул. Красоты, 10",
-                    "addressLocality": "Москва",
-                    "postalCode": "123456",
+                    "streetAddress": "{{ pageProps.config.contact.address }}",
+                    "addressLocality": "Балашиха",
+                    "postalCode": "143914",
                     "addressCountry": "RU"
                 },
                 "openingHoursSpecification": [
@@ -129,7 +131,7 @@ onMounted(() => {
                     <div
                         class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-100 to-pink-100 rounded-full mb-8">
                         <span class="w-2 h-2 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full mr-2"></span>
-                        <span class="text-sm font-semibold text-rose-600">Премиум-студия в Москве</span>
+                        <span class="text-sm font-semibold text-rose-600">Студя перманентного макияжа в Балашихе</span>
                     </div>
 
                     <!-- Заголовок -->
@@ -138,7 +140,7 @@ onMounted(() => {
                         <span class="bg-gradient-to-r from-rose-600 to-pink-500 bg-clip-text text-transparent">
               премиум-класса
             </span>
-                        в Москве
+                        в Балашихе
                     </h1>
 
                     <!-- Подзаголовок -->
@@ -619,12 +621,11 @@ onMounted(() => {
                                         <div>
                                             <h4 class="font-semibold text-gray-900 mb-2">Адрес студии</h4>
                                             <p class="text-gray-600">
-                                                Москва, ул. Красоты, 10<br>
-                                                Метро: Маяковская, Тверская<br>
-                                                Вход с торца здания, 3 этаж
+                                                {{ pageProps.config.contact.address }}<br>
+                                                Метро: ЖД ст. Никольская (МЦД-4)
                                             </p>
                                             <a
-                                                href="https://yandex.ru/maps"
+                                                href="https://yandex.ru/maps/-/CPAsbD9F"
                                                 target="_blank"
                                                 class="inline-flex items-center text-rose-600 hover:text-rose-700 font-medium mt-2"
                                             >
@@ -649,19 +650,19 @@ onMounted(() => {
                                             </svg>
                                         </div>
                                         <div>
-                                            <h4 class="font-semibold text-gray-900 mb-2">Телефоны</h4>
+                                            <h4 class="font-semibold text-gray-900 mb-2">Контакты</h4>
                                             <div class="space-y-1">
                                                 <a
-                                                    href="tel:+74951234567"
+                                                    :href="`tel:${pageProps.config.contact.phone}`"
                                                     class="block text-gray-600 hover:text-rose-600 transition-colors"
                                                 >
-                                                    +7 (495) 123-45-67
+                                                    {{ pageProps.config.contact.phone }}
                                                 </a>
                                                 <a
-                                                    href="tel:+79161234567"
+                                                    :href="`mailto:${pageProps.config.contact.email}`"
                                                     class="block text-gray-600 hover:text-rose-600 transition-colors"
                                                 >
-                                                    +7 (916) 123-45-67 (WhatsApp)
+                                                    {{ pageProps.config.contact.email }}
                                                 </a>
                                             </div>
                                         </div>
@@ -680,8 +681,7 @@ onMounted(() => {
                                         <div>
                                             <h4 class="font-semibold text-gray-900 mb-2">Часы работы</h4>
                                             <p class="text-gray-600">
-                                                Пн-Пт: 9:00 - 21:00<br>
-                                                Сб-Вс: 10:00 - 20:00<br>
+                                                {{ pageProps.config.contact.hours }}
                                                 <span class="text-sm text-rose-600">Принимаем по записи</span>
                                             </p>
                                         </div>
@@ -700,21 +700,14 @@ onMounted(() => {
                                         <div>
                                             <h4 class="font-semibold text-gray-900 mb-2">Мы в соцсетях</h4>
                                             <div class="flex space-x-3">
-                                                <a href="#" class="text-gray-600 hover:text-rose-600 transition-colors">
-                                                    <span class="sr-only">Instagram</span>
-                                                    <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
-                                                        <path
-                                                            d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073z"/>
-                                                    </svg>
-                                                </a>
-                                                <a href="#" class="text-gray-600 hover:text-rose-600 transition-colors">
+                                                <a :href="`https://vk.com/${pageProps.config.contact.vk}`" class="text-gray-600 hover:text-rose-600 transition-colors">
                                                     <span class="sr-only">VK</span>
                                                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                                         <path
                                                             d="M15.684 0H8.316C1.592 0 0 1.592 0 8.316v7.368C0 22.408 1.592 24 8.316 24h7.368C22.408 24 24 22.408 24 15.684V8.316C24 1.592 22.408 0 15.684 0zm3.692 17.123h-1.744c-.66 0-.864-.525-2.05-1.727-1.033-1-1.49-1.135-1.744-1.135-.356 0-.458.102-.458.593v1.575c0 .424-.135.678-1.253.678-1.846 0-3.896-1.118-5.335-3.202C4.624 12.75 3.802 9.944 3.802 9.944c0-.254.102-.491.593-.491h1.744c.44 0 .61.203.78.677.863 2.49 2.303 4.675 2.896 4.675.22 0 .322-.102.322-.66V9.964c-.068-1.186-.695-1.287-.695-1.71 0-.203.17-.407.44-.407h2.744c.373 0 .508.203.508.643v3.473c0 .372.17.508.271.508.22 0 .407-.136.813-.542 1.254-1.406 2.151-3.574 2.151-3.574.119-.254.305-.491.762-.491h1.744c.525 0 .644.271.525.643-.22.73-2.354 4.065-2.354 4.065-.186.305-.254.44 0 .78.186.254.796.78 1.203 1.253.746.847 1.32 1.558 1.473 2.05.17.525-.085.795-.576.795z"/>
                                                     </svg>
                                                 </a>
-                                                <a href="#" class="text-gray-600 hover:text-rose-600 transition-colors">
+                                                <a :href="`https://t.me/${pageProps.config.contact.telegram}`" class="text-gray-600 hover:text-rose-600 transition-colors">
                                                     <span class="sr-only">Telegram</span>
                                                     <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 24 24">
                                                         <path

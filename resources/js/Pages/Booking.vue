@@ -1,5 +1,5 @@
 <script setup>
-import {Head, useForm, router} from '@inertiajs/vue3';
+import {Head, useForm, router, usePage} from '@inertiajs/vue3';
 import {computed, ref, watch, onMounted} from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {
@@ -19,6 +19,8 @@ const props = defineProps({
     meta: Object,
     csrf_token: String,
 });
+
+const { props: pageProps } = usePage();
 
 // Form handling
 const form = useForm({
@@ -322,11 +324,11 @@ const checkSlotAvailability = async (date, time) => {
                                 Вернуться к услугам
                             </button>
                             <a
-                                href="https://wa.me/79991234567"
+                                :href="`https://t.me/${pageProps.config.contact.telegram}`"
                                 target="_blank"
                                 class="px-6 py-3 bg-white border border-green-600 text-green-600 rounded-lg hover:bg-green-50 transition-colors duration-300"
                             >
-                                Написать в WhatsApp
+                                Написать в Telegram
                             </a>
                         </div>
                     </div>

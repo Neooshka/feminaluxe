@@ -20,16 +20,16 @@ const selectedImage = ref(props.service.images[0]?.full);
     <section class="py-16 bg-white">
       <div class="container mx-auto px-4">
         <h1 class="text-5xl font-bold mb-6 text-primary">{{ service.name }}</h1>
-        <p class="text-xl mb-8 text-gray-700 leading-relaxed">{{ service.description }}</p>
+        <div class="text-xl mb-8 text-gray-700 leading-relaxed" v-html="service.description"></div>
         <p class="text-3xl font-bold text-accent mb-12">{{ service.price }} руб.</p>
 
         <!-- Галерея с lazy loading и modal -->
         <div class="gallery grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
           <div class="main-image sticky top-20">
-            <img :src="selectedImage" alt="Основное фото {{ service.name }}" class="w-full rounded-lg shadow-xl transition-all duration-300" loading="eager">
+            <img :src="selectedImage" :alt="`Основное фото ${service.name}`" class="w-full rounded-lg shadow-xl transition-all duration-300" loading="eager">
           </div>
           <div class="thumbnails grid grid-cols-2 gap-4">
-            <img v-for="(image, index) in service.images" :key="index" :src="image.thumb" alt="Миниатюра {{ service.name }}" class="cursor-pointer rounded-lg shadow-md hover:shadow-xl transition-shadow" @click="selectedImage = image.full" loading="lazy">
+            <img v-for="(image, index) in service.images" :key="index" :src="image.thumb" :alt="`Миниатюра ${service.name}`" class="cursor-pointer rounded-lg shadow-md hover:shadow-xl transition-shadow" @click="selectedImage = image.full" loading="lazy">
           </div>
         </div>
 

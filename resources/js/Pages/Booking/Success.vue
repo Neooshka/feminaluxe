@@ -1,5 +1,5 @@
 <script setup>
-import { Head, Link } from '@inertiajs/vue3';
+import { Head, Link, usePage } from '@inertiajs/vue3';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import {
   CheckCircleIcon,
@@ -13,6 +13,8 @@ const props = defineProps({
   booking: Object,
   meta: Object,
 });
+
+const { props: pageProps } = usePage();
 </script>
 
 <template>
@@ -150,11 +152,11 @@ const props = defineProps({
             Вернуться к услугам
           </Link>
           <a
-            href="https://wa.me/79991234567"
+            :href="`https://t.me/${pageProps.config.contact.telegram}`"
             target="_blank"
             class="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-emerald-500 text-white rounded-lg hover:shadow-lg transition-all duration-300 text-center font-medium"
           >
-            Написать в WhatsApp
+            Написать в Telegram
           </a>
         </div>
 
@@ -177,7 +179,7 @@ const props = defineProps({
                 Что делать, если нужно перенести запись?
               </div>
               <div class="text-gray-600 text-sm">
-                Позвоните нам по номеру +7 (999) 123-45-67 или напишите в WhatsApp. Мы поможем подобрать другое время.
+                Позвоните нам по номеру {{ pageProps.config.contact.phone }} или напишите в Telegram. Мы поможем подобрать другое время.
               </div>
             </div>
           </div>
