@@ -27,7 +27,9 @@ jobs:
           port: 22
           script: |
             cd /home/neo/sites/feminaluxe.ru
-            git pull origin main
+            git fetch
+            git stash
+            git reset --hard origin/main
             composer install --no-dev
             npm ci
             npm run build
