@@ -130,7 +130,7 @@ class ReviewController extends Controller
     /**
      * API endpoint for submitting new review
      */
-    public function store(Request $request): JsonResponse
+    public function store(Request $request)
     {
         $validated = $request->validate([
             'service_id' => ['required', 'exists:services,id'],
@@ -158,10 +158,9 @@ class ReviewController extends Controller
         // Отправляем уведомление администратору (можно добавить позже)
         // Notification::send($admins, new NewReviewSubmitted($review));
 
-        return response()->json([
-            'success' => true,
+        return Inertia::render('Reviews/Submitted', [
+            'review' => $review,
             'message' => 'Спасибо за ваш отзыв! Он будет опубликован после проверки модератором.',
-            'review_id' => $review->id,
         ]);
     }
 

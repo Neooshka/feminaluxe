@@ -8,6 +8,7 @@ use App\Domains\Services\Models\Service;
 use App\Domains\Services\Services\ServiceCacheService;
 use App\Domains\Services\Services\CategoryService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -63,10 +64,14 @@ class HomeController extends Controller
                 // Получаем все уникальные категории из базы
                 $categories = $this->categoryService->getCategoriesWithCounts();
 
+                // Получаем фотки мастера
+                $master = $this->getMasterData();
+
                 return [
                     'services' => $services,
                     'popularServices' => $popularServices,
-                    'categories' => $categories
+                    'categories' => $categories,
+                    'master' => $master,
                 ];
             },
             function () {
@@ -75,10 +80,41 @@ class HomeController extends Controller
                     'services' => [],
                     'popularServices' => [],
                     'categories' => [],
+                    'master' => $this->getMasterData(),
                 ];
             }
         );
 
         return Inertia::render('Home', $data);
+    }
+
+    private function getMasterData(): array
+    {
+        $masterDir = 'masters/anna';
+        $storage = Storage::disk('public');
+
+        // Получаем все фото кроме аватара
+        $allFiles = $storage->files($masterDir);
+        $photos = collect($allFiles)
+            ->filter(fn($file) => !str_contains(basename($file), 'avatar'))
+            ->map(fn($file) => Storage::url($file))
+            ->values()
+            ->toArray();
+
+        // Аватар
+        $avatar = collect($allFiles)
+            ->first(fn($file) => str_contains(basename($file), 'avatar'));
+
+        return [
+            'name' => 'Анна Кузнецова',
+            'title' => 'Профессионал с медицинским образованием и многолетним опытом работы',
+            'experience' => 9,
+            'procedures_count' => 2000,
+            'rating' => 5.0,
+            'description' => 'Опыт работы 9 лет. Специализация: пудровые брови, микроблейдинг, акварельные губы, межресничный перманент',
+            'photos' => $photos,
+            'avatar' => $avatar ? Storage::url($avatar) : null,
+            'total_photos' => count($photos),
+        ];
     }
 }

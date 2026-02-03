@@ -44,9 +44,15 @@ const selectedImage = ref(props.service.images[0]?.full);
           </div>
         </section>
 
-        <div class="text-center mt-12">
-          <Link :href="route('contact')" class="bg-accent text-white px-8 py-4 rounded-full text-xl hover:bg-opacity-90 transition">Записаться на {{ service.name }}</Link>
-        </div>
+          <div class="text-center mt-12">
+              <Link
+                  :href="route('bookings.create')"
+                  class="bg-accent text-white px-6 sm:px-8 py-3 sm:py-4 rounded-full text-lg sm:text-xl hover:bg-opacity-90 transition"
+              >
+                  <span class="sm:hidden">Записаться</span>
+                  <span class="hidden sm:inline">Записаться на {{ service.name }}</span>
+              </Link>
+          </div>
       </div>
     </section>
   </AppLayout>

@@ -1,6 +1,6 @@
 <script setup>
 import {Head, Link, usePage} from '@inertiajs/vue3';
-import {ref, onMounted, computed} from 'vue';
+import {ref, onMounted, computed, onBeforeUnmount} from 'vue';
 import {route} from "ziggy-js";
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ServiceCard from '@/Components/ServiceCard.vue';
@@ -10,7 +10,167 @@ const props = defineProps({
     services: Array,
     popularServices: Array,
     categories: Array,
+    master: {
+        type: Object,
+        required: true,
+        default: () => ({
+            name: '',
+            title: '',
+            experience: 0,
+            procedures_count: 0,
+            rating: 0,
+            description: '',
+            photos: [],
+            avatar: null,
+            total_photos: 0,
+        })
+    }
 });
+
+const currentIndex = ref(0);
+let autoSlideInterval = null;
+
+// === Добавляем переменные для свайпа ===
+const dragOffset = ref(0);
+const startX = ref(0);
+const isDragging = ref(false);
+const DRAG_THRESHOLD = 50; // минимальное расстояние свайпа в пикселях
+
+// Проверяем, есть ли фото для карусели
+const hasPhotos = computed(() => props.master.photos?.length > 0);
+const totalSlides = computed(() => props.master.total_photos || props.master.photos?.length || 0);
+
+// Следующий слайд
+const nextSlide = () => {
+    if (totalSlides.value <= 1) return;
+    currentIndex.value = (currentIndex.value + 1) % totalSlides.value;
+};
+
+// Предыдущий слайд
+const prevSlide = () => {
+    if (totalSlides.value <= 1) return;
+    currentIndex.value = (currentIndex.value - 1 + totalSlides.value) % totalSlides.value;
+};
+
+// Перейти к конкретному слайду
+const goToSlide = (index) => {
+    if (index >= 0 && index < totalSlides.value) {
+        currentIndex.value = index;
+    }
+};
+
+// === Touch события для мобильных ===
+const onTouchStart = (event) => {
+    if (totalSlides.value <= 1) return;
+
+    stopAutoSlide();
+    startX.value = event.touches[0].clientX;
+    isDragging.value = true;
+};
+
+const onTouchMove = (event) => {
+    if (!isDragging.value || totalSlides.value <= 1) return;
+
+    const currentX = event.touches[0].clientX;
+    const diff = currentX - startX.value;
+
+    // Ограничиваем драг чтобы не уйти слишком далеко
+    const maxDrag = window.innerWidth * 0.3;
+    dragOffset.value = Math.max(-maxDrag, Math.min(maxDrag, diff));
+
+    event.preventDefault();
+};
+
+const onTouchEnd = () => {
+    if (!isDragging.value || totalSlides.value <= 1) return;
+
+    const dragDistance = dragOffset.value;
+
+    // Определяем направление свайпа
+    if (Math.abs(dragDistance) > DRAG_THRESHOLD) {
+        if (dragDistance > 0) {
+            // Свайп вправо = предыдущий слайд
+            prevSlide();
+        } else {
+            // Свайп влево = следующий слайд
+            nextSlide();
+        }
+    }
+
+    // Сброс состояния
+    resetDrag();
+    startAutoSlide();
+};
+
+// === Mouse события для десктопа ===
+const onMouseDown = (event) => {
+    if (totalSlides.value <= 1) return;
+
+    stopAutoSlide();
+    startX.value = event.clientX;
+    isDragging.value = true;
+};
+
+const onMouseMove = (event) => {
+    if (!isDragging.value || totalSlides.value <= 1) return;
+
+    const currentX = event.clientX;
+    const diff = currentX - startX.value;
+    dragOffset.value = diff;
+};
+
+const onMouseEnd = () => {
+    if (!isDragging.value || totalSlides.value <= 1) return;
+
+    const dragDistance = dragOffset.value;
+
+    if (Math.abs(dragDistance) > DRAG_THRESHOLD) {
+        if (dragDistance > 0) {
+            prevSlide();
+        } else {
+            nextSlide();
+        }
+    }
+
+    resetDrag();
+    startAutoSlide();
+};
+
+const onMouseLeave = () => {
+    if (isDragging.value) {
+        resetDrag();
+        startAutoSlide();
+    }
+};
+
+// Сброс состояния драга
+const resetDrag = () => {
+    isDragging.value = false;
+    dragOffset.value = 0;
+    startX.value = 0;
+};
+
+// Автопрокрутка
+const startAutoSlide = () => {
+    if (totalSlides.value <= 1 || autoSlideInterval) return;
+    autoSlideInterval = setInterval(nextSlide, 5000);
+};
+
+const stopAutoSlide = () => {
+    if (autoSlideInterval) {
+        clearInterval(autoSlideInterval);
+        autoSlideInterval = null;
+    }
+};
+
+// Обновляем обработчики мыши
+const handleMouseEnter = () => {
+    stopAutoSlide();
+};
+
+const handleMouseLeave = () => {
+    startAutoSlide();
+};
 
 const { props: pageProps } = usePage();
 
@@ -60,6 +220,13 @@ const filterServices = (category) => {
 // Инициализация
 onMounted(() => {
     filteredServices.value = props.services || [];
+    if (hasPhotos.value) {
+        startAutoSlide();
+    }
+});
+
+onBeforeUnmount(() => {
+    stopAutoSlide();
 });
 </script>
 
@@ -131,7 +298,7 @@ onMounted(() => {
                     <div
                         class="inline-flex items-center px-4 py-2 bg-gradient-to-r from-rose-100 to-pink-100 rounded-full mb-8">
                         <span class="w-2 h-2 bg-gradient-to-r from-rose-500 to-pink-500 rounded-full mr-2"></span>
-                        <span class="text-sm font-semibold text-rose-600">Студя перманентного макияжа в Балашихе</span>
+                        <span class="text-sm font-semibold text-rose-600">Студия перманентного макияжа в Балашихе</span>
                     </div>
 
                     <!-- Заголовок -->
@@ -379,118 +546,127 @@ onMounted(() => {
 
         <!-- Специалисты -->
         <section id="specialists" class="py-16 lg:py-24 bg-gradient-to-b from-gray-50 to-white">
-            <div class="container mx-auto px-4 lg:px-8">
-                <div class="text-center mb-12 lg:mb-16">
-                    <h2 class="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                        Наши мастера
-                    </h2>
-                    <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-                        Профессионалы с медицинским образованием и многолетним опытом работы
-                    </p>
+            <div class="container mx-auto px-4">
+                <!-- Заголовок секции (если нужен) -->
+                <div class="text-center mb-12">
+                    <h3 class="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">{{ master.name }}</h3>
+                    <div class="text-rose-600 font-semibold mb-3 text-base lg:text-lg">
+                        {{ master.title }}
+                    </div>
                 </div>
 
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    <!-- Мастер 1 -->
-                    <div
-                        class="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500">
-                        <div class="h-64 overflow-hidden">
-                            <img
-                                src="/images/master-1.jpg"
-                                alt="Мастер Мария"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        </div>
-                        <div class="p-6 relative -mt-12">
-                            <div
-                                class="w-24 h-24 mx-auto rounded-full border-4 border-white overflow-hidden mb-4 shadow-lg">
-                                <img src="/images/master-1-avatar.jpg" alt="Мария" class="w-full h-full object-cover"/>
-                            </div>
-                            <div class="text-center">
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">Мария Иванова</h3>
-                                <div class="text-rose-600 font-semibold mb-3">Ведущий мастер по бровям</div>
-                                <p class="text-gray-600 text-sm mb-4">
-                                    Опыт работы 7 лет. Специализация: пудровые брови, микроблейдинг, коррекция
-                                </p>
-                                <div class="flex justify-center space-x-2">
-                  <span class="px-3 py-1 bg-rose-100 text-rose-600 text-xs font-semibold rounded-full">
-                    1500+ процедур
-                  </span>
-                                    <span
-                                        class="px-3 py-1 bg-amber-100 text-amber-600 text-xs font-semibold rounded-full">
-                    ★ 4.9
-                  </span>
+                <!-- Карточка мастера с ограничением ширины -->
+                <div class="max-w-4xl mx-auto">
+                    <div class="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500"
+                         @mouseenter="stopAutoSlide"
+                         @mouseleave="startAutoSlide">
+
+                        <!-- Карусель фотографий -->
+                        <div class="h-64 lg:h-80 overflow-hidden relative bg-gray-100"
+                             @touchstart="onTouchStart"
+                             @touchmove="onTouchMove"
+                             @touchend="onTouchEnd"
+                             @mousedown="onMouseDown"
+                             @mousemove="onMouseMove"
+                             @mouseup="onMouseEnd"
+                             @mouseleave="onMouseLeave">
+
+                            <!-- Контейнер для фотографий -->
+                            <div class="absolute inset-0 flex transition-transform duration-500 ease-in-out"
+                                 :style="{
+             transform: `translateX(calc(-${currentIndex * 100}% + ${dragOffset}px))`,
+             transition: isDragging ? 'none' : 'transform 500ms ease-in-out'
+         }">
+                                <!-- Динамические фото -->
+                                <div v-for="(photo, index) in master.photos"
+                                     :key="index"
+                                     class="w-full h-full flex-shrink-0 flex items-center justify-center">
+                                    <img
+                                        :src="photo"
+                                        :alt="`${master.name} - фото ${index + 1}`"
+                                        class="max-w-full max-h-full object-contain select-none"
+                                        loading="lazy"
+                                        draggable="false"
+                                    />
                                 </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <!-- Мастер 2 -->
-                    <div
-                        class="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500">
-                        <div class="h-64 overflow-hidden">
-                            <img
-                                src="/images/master-2.jpg"
-                                alt="Мастер Анастасия"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
+                            <!-- Градиент -->
                             <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        </div>
-                        <div class="p-6 relative -mt-12">
-                            <div
-                                class="w-24 h-24 mx-auto rounded-full border-4 border-white overflow-hidden mb-4 shadow-lg">
-                                <img src="/images/master-2-avatar.jpg" alt="Анастасия"
-                                     class="w-full h-full object-cover"/>
-                            </div>
-                            <div class="text-center">
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">Анастасия Петрова</h3>
-                                <div class="text-rose-600 font-semibold mb-3">Эксперт по губам</div>
-                                <p class="text-gray-600 text-sm mb-4">
-                                    Опыт работы 5 лет. Специализация: акварельные губы, контур губ, удаление татуажа
-                                </p>
-                                <div class="flex justify-center space-x-2">
-                  <span class="px-3 py-1 bg-rose-100 text-rose-600 text-xs font-semibold rounded-full">
-                    1200+ процедур
-                  </span>
-                                    <span
-                                        class="px-3 py-1 bg-amber-100 text-amber-600 text-xs font-semibold rounded-full">
-                    ★ 4.8
-                  </span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
 
-                    <!-- Мастер 3 -->
-                    <div
-                        class="group relative overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl transition-all duration-500">
-                        <div class="h-64 overflow-hidden">
-                            <img
-                                src="/images/master-3.jpg"
-                                alt="Мастер Елена"
-                                class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
-                            />
-                            <div class="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
-                        </div>
-                        <div class="p-6 relative -mt-12">
-                            <div
-                                class="w-24 h-24 mx-auto rounded-full border-4 border-white overflow-hidden mb-4 shadow-lg">
-                                <img src="/images/master-3-avatar.jpg" alt="Елена" class="w-full h-full object-cover"/>
+                            <!-- Индикаторы карусели (если фото больше 1) -->
+                            <div v-if="master.total_photos > 1"
+                                 class="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-2">
+                                <button
+                                    v-for="index in master.total_photos"
+                                    :key="index"
+                                    @click="goToSlide(index - 1)"
+                                    @touchstart="(e) => { e.preventDefault(); goToSlide(index - 1); }"
+                                    class="w-2 h-2 rounded-full transition-all duration-300 touch-manipulation"
+                                    :class="{
+                'bg-white w-4': currentIndex === index - 1,
+                'bg-white/50 hover:bg-white/75 active:bg-white': currentIndex !== index - 1
+            }"
+                                    :aria-label="`Перейти к фото ${index}`"
+                                />
                             </div>
+
+                            <!-- Кнопки навигации (если фото больше 1) -->
+                            <button
+                                v-if="master.total_photos > 1"
+                                @click="prevSlide"
+                                @touchstart="(e) => { e.preventDefault(); prevSlide(); }"
+                                class="hidden md:block absolute left-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white transition-all duration-300 touch-manipulation active:bg-white/60"
+                                aria-label="Предыдущее фото"
+                            >
+                                &larr;
+                            </button>
+                            <button
+                                v-if="master.total_photos > 1"
+                                @click="nextSlide"
+                                @touchstart="(e) => { e.preventDefault(); nextSlide(); }"
+                                class="hidden md:block absolute right-4 top-1/2 transform -translate-y-1/2 w-10 h-10 rounded-full bg-white/20 hover:bg-white/40 backdrop-blur-sm text-white transition-all duration-300 touch-manipulation active:bg-white/60"
+                                aria-label="Следующее фото"
+                            >
+                                &rarr;
+                            </button>
+
+                            <!-- Бейдж количества фото -->
+                            <div v-if="master.total_photos > 0"
+                                 class="absolute top-4 right-4 bg-black/60 text-white text-xs px-2 py-1 rounded-full backdrop-blur-sm">
+                                {{ currentIndex + 1 }}/{{ master.total_photos }}
+                            </div>
+                        </div>
+
+                        <!-- Информация о мастере -->
+                        <div class="p-6 lg:p-8 relative">
+                            <!-- Аватар -->
+                            <div v-if="master.avatar"
+                                 class="w-24 h-24 lg:w-28 lg:h-28 mx-auto rounded-full border-4 border-white overflow-hidden mb-4 shadow-lg">
+                                <img
+                                    :src="master.avatar"
+                                    :alt="master.name"
+                                    class="w-full h-full object-cover"
+                                />
+                            </div>
+
                             <div class="text-center">
-                                <h3 class="text-xl font-bold text-gray-900 mb-2">Елена Смирнова</h3>
-                                <div class="text-rose-600 font-semibold mb-3">Специалист по векам</div>
-                                <p class="text-gray-600 text-sm mb-4">
-                                    Опыт работы 6 лет. Специализация: межресничный перманент, стрелки, удаление
+                                <!-- Описание -->
+                                <p class="text-gray-600 text-sm lg:text-base mb-4 lg:mb-6 max-w-2xl mx-auto">
+                                    {{ master.description }}
                                 </p>
-                                <div class="flex justify-center space-x-2">
-                  <span class="px-3 py-1 bg-rose-100 text-rose-600 text-xs font-semibold rounded-full">
-                    1000+ процедур
-                  </span>
-                                    <span
-                                        class="px-3 py-1 bg-amber-100 text-amber-600 text-xs font-semibold rounded-full">
-                    ★ 4.9
-                  </span>
+
+                                <!-- Статистика -->
+                                <div class="flex flex-wrap justify-center gap-2 lg:gap-3">
+                            <span class="px-3 lg:px-4 py-1 lg:py-2 bg-rose-100 text-rose-600 text-xs lg:text-sm font-semibold rounded-full">
+                                {{ master.experience }} лет опыта
+                            </span>
+                                    <span class="px-3 lg:px-4 py-1 lg:py-2 bg-rose-100 text-rose-600 text-xs lg:text-sm font-semibold rounded-full">
+                                {{ master.procedures_count.toLocaleString('ru-RU') }}+ процедур
+                            </span>
+                                    <span class="px-3 lg:px-4 py-1 lg:py-2 bg-amber-100 text-amber-600 text-xs lg:text-sm font-semibold rounded-full">
+                                ★ {{ master.rating.toFixed(1) }}
+                            </span>
                                 </div>
                             </div>
                         </div>
@@ -516,86 +692,12 @@ onMounted(() => {
                                 Оставьте заявку и мы перезвоним вам в течение 15 минут, чтобы ответить на все вопросы и
                                 подобрать удобное время
                             </p>
-
-                            <form @submit.prevent="submitForm" class="space-y-6">
-                                <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                                    <div>
-                                        <label for="name" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Ваше имя *
-                                        </label>
-                                        <input
-                                            type="text"
-                                            id="name"
-                                            required
-                                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-colors"
-                                            placeholder="Имя"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label for="phone" class="block text-sm font-medium text-gray-700 mb-2">
-                                            Телефон *
-                                        </label>
-                                        <input
-                                            type="tel"
-                                            id="phone"
-                                            required
-                                            class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-colors"
-                                            placeholder="+7 (___) ___-__-__"
-                                        />
-                                    </div>
-                                </div>
-
-                                <div>
-                                    <label for="service" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Интересующая услуга
-                                    </label>
-                                    <select
-                                        id="service"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-colors"
-                                    >
-                                        <option value="">Выберите услугу</option>
-                                        <option value="brows">Пудровые брови</option>
-                                        <option value="lips">Акварельные губы</option>
-                                        <option value="eyeliner">Межресничный перманент</option>
-                                        <option value="correction">Коррекция татуажа</option>
-                                        <option value="removal">Удаление татуажа</option>
-                                    </select>
-                                </div>
-
-                                <div>
-                                    <label for="message" class="block text-sm font-medium text-gray-700 mb-2">
-                                        Комментарий
-                                    </label>
-                                    <textarea
-                                        id="message"
-                                        rows="4"
-                                        class="w-full px-4 py-3 rounded-lg border border-gray-300 focus:border-rose-500 focus:ring-2 focus:ring-rose-200 transition-colors"
-                                        placeholder="Опишите ваши пожелания или вопросы..."
-                                    ></textarea>
-                                </div>
-
-                                <div class="flex items-center">
-                                    <input
-                                        type="checkbox"
-                                        id="privacy"
-                                        required
-                                        class="w-4 h-4 text-rose-500 border-gray-300 rounded focus:ring-rose-500"
-                                    />
-                                    <label for="privacy" class="ml-2 text-sm text-gray-600">
-                                        Соглашаюсь с
-                                        <a href="#" class="text-rose-600 hover:text-rose-700 underline">
-                                            политикой конфиденциальности
-                                        </a>
-                                    </label>
-                                </div>
-
-                                <button
-                                    type="submit"
-                                    class="w-full px-8 py-4 bg-gradient-to-r from-rose-500 to-pink-500 text-white font-semibold rounded-lg hover:shadow-xl hover:shadow-rose-200 transition-all duration-300 transform hover:-translate-y-0.5"
-                                >
-                                    Записаться на консультацию
-                                </button>
-                            </form>
+                            <Link
+                                :href="route('bookings.create')"
+                                class="btn-gradient-primary px-6 py-3 hover:shadow-rose-strong w-full flex justify-center"
+                            >
+                                Записаться онлайн
+                            </Link>
                         </div>
 
                         <!-- Правая колонка: Контактная информация -->

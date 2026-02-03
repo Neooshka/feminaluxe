@@ -36,6 +36,7 @@ class HandleInertiaRequests extends Middleware
             'seo' => fn () => $request->get('SEOData')?->toArray() ?? [],  // From controller withViewData
             'config' => [
                 'contact' => config('app.contact'),
+                'yandex_maps' => config('app.yandex_maps'),
             ],
         ]);
     }

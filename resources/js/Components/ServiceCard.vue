@@ -121,7 +121,7 @@ import {computed} from 'vue';
 const props = defineProps({
     service: {
         type: Object,
-        required: true
+        required: true,
     }
 });
 

@@ -20,7 +20,7 @@ class BookingFactory extends Factory
     public function definition(): array
     {
         return [
-            'service_id' => fn () => Service::inRandomOrder()->first()?->id ?? Service::factory(),
+            'service_id' => fn () => Service::inRandomOrder()->first()?->id,
             'client_name' => $this->faker->name(),
             'client_email' => $this->faker->safeEmail(),
             'client_phone' => $this->faker->phoneNumber(),

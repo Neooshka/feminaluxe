@@ -47,7 +47,12 @@ Route::get('/portfolio', function () {
 
 Route::get('/contact', function () {
     return Inertia::render('Contact', [
-        'services' => Service::select('id', 'name')->get(),
+        'yandex_maps' => [
+            'api_key' => config('app.yandex_maps.api_key'),
+            'latitude' => config('app.yandex_maps.latitude'),
+            'longitude' => config('app.yandex_maps.longitude'),
+            'zoom' => config('app.yandex_maps.zoom'),
+        ],
     ]);
 })->name('contact');
 

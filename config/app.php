@@ -152,7 +152,7 @@ return [
 //        App\Providers\EventServiceProvider::class,
 //        App\Providers\RouteServiceProvider::class,
     ],
-    
+
     'contact' => [
         'email' => env('CONTACT_EMAIL', 'info@feminaluxe.ru'),
         'phone' => env('CONTACT_PHONE', '+7 (495) 123-45-67'),
@@ -160,5 +160,12 @@ return [
         'hours' => env('CONTACT_HOURS', 'Ежедневно с 9:00 до 21:00'),
         'vk' => env('CONTACT_VK', 'feminaluxe'),
         'telegram' => env('CONTACT_TELEGRAM', 'feminaluxe'),
+    ],
+
+    'yandex_maps' => [
+        'api_key' => env('YANDEX_MAPS_API_KEY'),
+        'latitude' => env('YANDEX_MAPS_LATITUDE', 55.755864),
+        'longitude' => env('YANDEX_MAPS_LONGITUDE', 37.617698),
+        'zoom' => env('YANDEX_MAPS_ZOOM', 15),
     ],
 ];

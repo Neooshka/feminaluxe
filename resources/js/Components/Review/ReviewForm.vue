@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted } from 'vue';
 import { XMarkIcon, StarIcon } from '@heroicons/vue/24/outline';
 import { StarIcon as StarIconSolid } from '@heroicons/vue/24/solid';
 import { useForm } from '@inertiajs/vue3';
@@ -85,6 +85,15 @@ const setRating = (rating) => {
 const closeModal = () => {
   emit('close');
 };
+
+onMounted(() => {
+  fetchServices();
+
+  // Set initial service
+  if (props.initialService) {
+    form.service_id = props.initialService.id;
+  }
+});
 </script>
 
 <template>
