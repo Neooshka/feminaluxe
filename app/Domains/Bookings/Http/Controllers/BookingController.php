@@ -152,7 +152,7 @@ class BookingController extends Controller
         $redirectUrl = URL::signedRoute('bookings.success', [
             'booking' => $booking->id,
         ]);
-        
+
         return redirect()->to($redirectUrl);
     }
 
@@ -225,7 +225,7 @@ class BookingController extends Controller
      * Success page after booking
      */
     public function success(Request $request, Booking $booking): Response
-    {xdebug_break();
+    {
         return Inertia::render('Booking/Success', [
             'booking' => $booking->load('service'),
             'meta' => [
