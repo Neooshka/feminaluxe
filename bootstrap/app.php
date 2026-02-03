@@ -16,6 +16,10 @@ return Application::configure(basePath: dirname(__DIR__))
         $middleware->web(append: [
             HandleInertiaRequests::class,
         ]);
+        $middleware->trustProxies(at: [
+            '94.228.123.16',
+            '127.0.0.1'
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
         //
