@@ -136,7 +136,7 @@
         </div>
 
         <!-- CTA Section -->
-        <CTASection />
+        <CTASection :average-rating="averageRating"  :count-posts="countPosts" />
     </AppLayout>
 </template>
 
@@ -152,6 +152,14 @@ const props = defineProps({
     posts: Object,
     popularTags: Array,
     filters: Object,
+    countPosts: {
+      type: Number,
+      default: 100
+    },
+    averageRating: {
+      type: Number,
+      default: 4.9
+    },
 });
 
 const searchQuery = ref('');

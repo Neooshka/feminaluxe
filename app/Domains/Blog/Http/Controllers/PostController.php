@@ -7,6 +7,7 @@ namespace App\Domains\Blog\Http\Controllers;
 use App\Domains\Blog\Models\Post;
 use App\Domains\Blog\Models\Tag;
 use App\Domains\Blog\Services\BlogSeoService;
+use App\Domains\Reviews\Models\Review;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Inertia\Inertia;
@@ -30,6 +31,10 @@ class PostController
                 $q->where('slug', $request->tag);
             });
         }
+
+        $avgRating = (float) Review::approved()->avg('rating') ?? 0;
+        $averageRating = round($avgRating, 1);
+        $countPosts = Post::published()->count();
 
         $posts = $query->paginate(9)
             ->through(function ($post) {
@@ -65,6 +70,8 @@ class PostController
             ]);
 
         return Inertia::render('Blog/Index', [
+            'countPosts' => $this->formatPostsCount($countPosts),
+            'averageRating' => $averageRating,
             'posts' => $posts,
             'popularTags' => $popularTags,
             'filters' => $request->only(['tag']),
@@ -136,5 +143,34 @@ class PostController
         $wordCount = str_word_count(strip_tags($content));
         $minutes = ceil($wordCount / 200); // 200 слов в минуту
         return max(1, $minutes);
+    }
+
+    /**
+     * Форматирует число по правилам:
+     * - от 10 до 100: до целого десятка
+     * - от 100 до 1000: до целой сотни
+     * - более 1000: до целой тысячи
+     */
+    private function formatPostsCount(int|float $number): float
+    {
+        $num = (float) $number;
+
+        // Более 1000: округляем до тысяч
+        if ($num >= 1000) {
+            return ceil($num / 1000) * 1000;
+        }
+
+        // От 100 до 999: округляем до сотен
+        if ($num >= 100) {
+            return ceil($num / 100) * 100;
+        }
+
+        // От 10 до 99: округляем до десятков
+        if ($num >= 10) {
+            return ceil($num / 10) * 10;
+        }
+
+        // Меньше 10: оставляем как есть
+        return $num;
     }
 }
