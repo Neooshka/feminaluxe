@@ -38,6 +38,16 @@ class HandleInertiaRequests extends Middleware
                 'contact' => config('app.contact'),
                 'yandex_maps' => config('app.yandex_maps'),
             ],
+            'locale' => [
+                'pagination' => [
+                    'previous' => 'Назад',
+                    'next' => 'Вперед',
+                    'showing' => 'Показано с',
+                    'to' => 'по',
+                    'of' => 'из',
+                    'results' => 'результатов',
+                ],
+            ],
         ]);
     }
 }

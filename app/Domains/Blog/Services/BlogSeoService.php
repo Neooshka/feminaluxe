@@ -15,7 +15,7 @@ class BlogSeoService
             title: 'Блог о перманентном макияже | Советы, тренды, уход | Feminaluxe',
             description: 'Полезные статьи о перманентном макияже, уходе за татуажем, трендах 2025 года. Советы от мастеров студии Feminaluxe.',
             author: 'Feminaluxe Studio',
-            image: asset('img/blog/og-index.jpg'),
+            image: '/storage/img/blog/og-default.svg',
             published_time: Carbon::now(),
             modified_time: Carbon::now(),
             robots: 'index, follow',

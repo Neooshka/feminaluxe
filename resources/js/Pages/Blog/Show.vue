@@ -19,7 +19,7 @@ const parsedContent = marked(props.post.content);
       <img v-if="post.featured_image" :src="post.featured_image" alt="Featured image for {{ post.title }}" class="w-full h-auto mb-8 rounded-lg" loading="lazy">
       <div class="prose lg:prose-xl" v-html="parsedContent"></div>
       <div class="text-center mt-12">
-        <Link :href="route('blog')" class="text-primary hover:underline">Вернуться в блог</Link>
+        <Link :href="route('blog.index')" class="text-primary hover:underline">Вернуться в блог</Link>
       </div>
     </article>
   </AppLayout>

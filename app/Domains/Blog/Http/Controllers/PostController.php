@@ -37,14 +37,15 @@ class PostController
                     'id' => $post->id,
                     'title' => $post->title,
                     'slug' => $post->slug,
+                    'views_count' => $post->views_count,
                     'excerpt' => Str::limit(strip_tags($post->content), 150),
                     'published_at' => $post->published_at->format('d.m.Y'),
                     'published_at_full' => $post->published_at->isoFormat('D MMMM YYYY'),
                     'reading_time' => $this->calculateReadingTime($post->content),
                     'featured_image' => $post->getFirstMediaUrl('featured', 'thumb') ?: 
-                        asset('img/blog/fallback-thumb.svg'),
+                        '/storage/img/blog/fallback-thumb.svg',
                     'featured_image_large' => $post->getFirstMediaUrl('featured') ?: 
-                        asset('img/blog/fallback-post.svg'),
+                        '/storage/img/blog/fallback-post.svg',
                     'tags' => $post->tags->map(fn($tag) => [
                         'name' => $tag->name,
                         'slug' => $tag->slug,
@@ -116,7 +117,7 @@ class PostController
                 'published_at_full' => $post->published_at->isoFormat('D MMMM YYYY'),
                 'reading_time' => $this->calculateReadingTime($post->content),
                 'featured_image' => $post->getFirstMediaUrl('featured') ?: 
-                    asset('img/blog/fallback-post.svg'),
+                    '/storage/img/blog/fallback-post.svg',
                 'tags' => $tags,
                 'author' => [
                     'name' => 'Мастер Feminaluxe',
