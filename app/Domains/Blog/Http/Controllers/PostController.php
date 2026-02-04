@@ -43,13 +43,13 @@ class PostController
                     'title' => $post->title,
                     'slug' => $post->slug,
                     'views_count' => $post->views_count,
-                    'excerpt' => Str::limit(strip_tags($post->content), 150),
+                    'excerpt' => $this->cleanContentForExcerpt($post->content),
                     'published_at' => $post->published_at->format('d.m.Y'),
                     'published_at_full' => $post->published_at->isoFormat('D MMMM YYYY'),
                     'reading_time' => $this->calculateReadingTime($post->content),
-                    'featured_image' => $post->getFirstMediaUrl('featured', 'thumb') ?: 
+                    'featured_image' => $post->getFirstMediaUrl('featured', 'thumb') ?:
                         '/storage/img/blog/fallback-thumb.svg',
-                    'featured_image_large' => $post->getFirstMediaUrl('featured') ?: 
+                    'featured_image_large' => $post->getFirstMediaUrl('featured') ?:
                         '/storage/img/blog/fallback-post.svg',
                     'tags' => $post->tags->map(fn($tag) => [
                         'name' => $tag->name,
@@ -103,7 +103,7 @@ class PostController
                     'id' => $item->id,
                     'title' => $item->title,
                     'slug' => $item->slug,
-                    'excerpt' => Str::limit(strip_tags($item->content), 100),
+                    'excerpt' => $this->cleanContentForExcerpt($item->content),
                     'featured_image' => $item->getFirstMediaUrl('featured', 'thumb'),
                     'published_at' => $item->published_at->format('d.m.Y'),
                 ];
@@ -123,7 +123,7 @@ class PostController
                 'published_at' => $post->published_at->format('d.m.Y'),
                 'published_at_full' => $post->published_at->isoFormat('D MMMM YYYY'),
                 'reading_time' => $this->calculateReadingTime($post->content),
-                'featured_image' => $post->getFirstMediaUrl('featured') ?: 
+                'featured_image' => $post->getFirstMediaUrl('featured') ?:
                     '/storage/img/blog/fallback-post.svg',
                 'tags' => $tags,
                 'author' => [
@@ -136,6 +136,25 @@ class PostController
         ])->withViewData([
             'SEOData' => $post->getDynamicSEOData(),
         ]);
+    }
+
+    private function cleanContentForExcerpt(string $content): string
+    {
+        // 1. Декодируем HTML сущности первого уровня
+        // &lt; становится <, &gt; становится >, &amp; становится &
+        $decoded = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // 2. Теперь удаляем HTML теги (они стали обычными < >)
+        $stripped = strip_tags($decoded);
+
+        // 3. Декодируем еще раз на случай вложенных сущностей
+        $final = html_entity_decode($stripped, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // 4. Убираем лишние пробелы и переносы
+        $clean = preg_replace('/\s+/', ' ', $final);
+
+        // 5. Обрезаем до нужной длины
+        return Str::limit(trim($clean), 200);
     }
 
     private function calculateReadingTime(string $content): int

@@ -3,14 +3,14 @@
     <article class="group relative bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-2xl transition-all duration-300 hover:-translate-y-2">
         <!-- Featured Image -->
         <div class="relative h-48 overflow-hidden">
-            <img 
-                :src="post.featured_image" 
+            <img
+                :src="post.featured_image"
                 :alt="post.title"
-                class="absolute inset-0 w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
+                class="absolute inset-0 w-full h-full object-contain group-hover:scale-110 transition-transform duration-500"
                 loading="lazy"
             />
             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
-            
+
             <!-- Reading Time -->
             <div class="absolute top-4 right-4">
                 <span class="px-3 py-1 bg-white/90 backdrop-blur-sm text-gray-700 text-xs font-bold rounded-full flex items-center gap-1">
@@ -44,7 +44,7 @@
 
             <!-- Tags -->
             <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-2 mb-4">
-                <span 
+                <span
                     v-for="tag in post.tags.slice(0, 2)"
                     :key="tag.slug"
                     class="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded hover:bg-gray-200 transition"
