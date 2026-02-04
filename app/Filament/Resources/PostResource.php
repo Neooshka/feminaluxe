@@ -50,7 +50,7 @@ class PostResource extends Resource
                         Forms\Components\TextInput::make('slug')
                             ->label('URL-адрес')
                             ->required()
-                            ->maxLength(50)
+                            ->maxLength(150)
                             ->unique(ignoreRecord: true)
                             ->helperText('Уникальный идентификатор для URL'),
 
