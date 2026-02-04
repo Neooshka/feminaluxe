@@ -453,3 +453,21 @@ html {
 .bg-mcd-4 {
     background-color: #3fb485;
 }
+.text-indent-1 {
+    text-indent: 0.25cm;
+}
+.text-indent-2 {
+    text-indent: 0.5cm;
+}
+.text-indent-3 {
+    text-indent: 0.75cm;
+}
+.text-indent-4 {
+    text-indent: 1cm;
+}
+.text-indent-5 {
+    text-indent: 1.25cm;
+}
+.text-indent-6 {
+    text-indent: 1.5cm;
+}

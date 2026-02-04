@@ -99,7 +99,7 @@ class PortfolioResource extends Resource
                             Forms\Components\TextInput::make('seo_keywords')
                                 ->label('Ключевые слова')
                                 ->helperText('Через запятую. Например: перманентный макияж, брови, татуаж')
-                                ->maxLength(255)
+                                ->maxLength(300)
                                 ->columnSpanFull(),
                         ])->collapsed(),
                 ])->columns(1),

@@ -128,7 +128,7 @@
                         <!-- Description -->
                         <div class="prose prose-lg max-w-none">
                             <h3 class="text-2xl font-bold text-gray-900 mb-4">Описание работы:</h3>
-                            <div class="text-gray-700 leading-relaxed space-y-4" v-html="portfolio.description"></div>
+                            <div class="text-gray-700 leading-relaxed space-y-4 text-justify" v-html="portfolio.description"></div>
                         </div>
 
                         <!-- CTA Buttons -->
