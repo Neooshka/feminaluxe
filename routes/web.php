@@ -8,6 +8,7 @@ use App\Domains\Reviews\Http\Controllers\ReviewController;
 use App\Domains\Services\Http\Controllers\ServiceController;
 use App\Http\Controllers\MediaThumbnailController;
 use App\Domains\Services\Models\Service;
+use App\Domains\Portfolio\Http\Controllers\PortfolioController;
 use App\Http\Controllers\Api\SitemapController;
 use App\Http\Controllers\HomeController;
 use Illuminate\Support\Facades\Route;
@@ -33,17 +34,11 @@ Route::prefix('services')->middleware(['throttle:60,1'])->name('services.')->gro
 
 Route::resource('blog', PostController::class)->only(['index', 'show'])->parameters(['blog' => 'post:slug'])->names(['index' => 'blog.index', 'show' => 'blog.show']);
 
-Route::get('/portfolio', function () {
-    $images = Service::with('media')->get()->flatMap(fn($s) => $s->getMedia('before_after')->map(fn($m) => [
-        'thumb' => route('media.thumbnail', [
-            'mediaId' => $m->id,
-            'type' => 'thumb'
-        ]),
-        'full' => $m->getUrl(),
-        'caption' => $s->name . ' - До/После',
-    ]));
-    return Inertia::render('Portfolio', ['images' => $images]);
-})->name('portfolio');
+Route::get('/portfolio', [PortfolioController::class, 'index'])
+    ->name('portfolio');
+
+Route::get('/portfolio/{slug}', [PortfolioController::class, 'show'])
+    ->name('portfolio.show');
 
 Route::get('/contact', function () {
     return Inertia::render('Contact', [

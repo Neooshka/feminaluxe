@@ -80,18 +80,28 @@ class PortfolioResource extends Resource
                                 ->label('Дата публикации')
                                 ->default(now()),
                         ])->columns(2),
-    
-                    Section::make('SEO')
+
+                    Section::make('SEO Настройки')
                         ->schema([
-                            Forms\Components\Textarea::make('seo.description')
-                                ->label('Meta Description')
-                                ->rows(3)
-                                ->maxLength(160),
-    
-                            Forms\Components\TextInput::make('seo.title')
+                            Forms\Components\TextInput::make('seo_title')
                                 ->label('Meta Title')
-                                ->maxLength(60),
-                        ]),
+                                ->helperText('До 60 символов. Если оставить пустым, будет использован заголовок.')
+                                ->maxLength(60)
+                                ->columnSpanFull(),
+
+                            Forms\Components\Textarea::make('seo_description')
+                                ->label('Meta Description')
+                                ->helperText('До 160 символов. Если оставить пустым, будет сгенерирован из описания.')
+                                ->rows(3)
+                                ->maxLength(160)
+                                ->columnSpanFull(),
+
+                            Forms\Components\TextInput::make('seo_keywords')
+                                ->label('Ключевые слова')
+                                ->helperText('Через запятую. Например: перманентный макияж, брови, татуаж')
+                                ->maxLength(255)
+                                ->columnSpanFull(),
+                        ])->collapsed(),
                 ])->columns(1),
                 Group::make()->schema([
                     Section::make('Фотографии')

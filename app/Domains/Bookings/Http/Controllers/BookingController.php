@@ -44,6 +44,17 @@ class BookingController extends Controller
             });
         }
 
+        // Если передан id услуги - предзаполняем её
+        if ($request->has('service')) {
+            $cacheKey = 'booking_service_' . $request->input('service');
+            $service = Cache::remember($cacheKey, 3600, function () use ($request) {
+                return Service::query()
+                    ->where('id', $request->input('service'))
+                    ->active()
+                    ->first();
+            });
+        }
+
         // Получаем все активные услуги для выпадающего списка
         $services = $this->cacheService->remember(
             'booking_services_list',
