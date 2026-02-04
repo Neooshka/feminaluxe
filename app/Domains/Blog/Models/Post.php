@@ -60,7 +60,7 @@ class Post extends Model implements HasMedia
                 Str::limit(strip_tags($this->content), 160),
             author: 'Feminaluxe Studio',
             image: $this->getFirstMediaUrl('featured') ?: 
-                asset('img/blog/og-default.jpg'),
+                asset('img/blog/og-default.svg'),
             published_time: $this->published_at,
             modified_time: $this->updated_at,
             robots: $this->published_at && $this->published_at <= now() 
