@@ -12,6 +12,7 @@ use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Forms;
+use Filament\Forms\Components\SpatieMediaLibraryFileUpload;
 use Filament\Resources\Resource;
 use Filament\Schemas\Components\Form;
 use Filament\Schemas\Components\Section;
@@ -68,12 +69,12 @@ class PostResource extends Resource
                             ->fileAttachmentsDirectory('blog')
                             ->columnSpanFull(),
 
-                        Forms\Components\FileUpload::make('featured')
+                        SpatieMediaLibraryFileUpload::make('featured')
                             ->label('Обложка статьи')
                             ->collection('featured')
                             ->image()
                             ->directory('blog/featured')
-                            ->maxSize(5120)
+                            ->maxSize(10240)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
                             ->helperText('Рекомендуемый размер: 1200x630px'),
                     ]),
