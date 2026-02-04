@@ -74,6 +74,7 @@ class ReviewService
             $total = Review::approved()->count();
             $avg = (float) Review::approved()->avg('rating') ?? 0;
             $average = round($avg, 1);
+            $satisfied = Review::approved()->where('rating','>=',4)->count();
 
             $ratingDistribution = [];
             for ($i = 5; $i >= 1; $i--) {
@@ -86,6 +87,8 @@ class ReviewService
 
             return [
                 'total_reviews' => $total,
+                'satisfied_reviews' => $satisfied,
+                'satisfied_range' => $total ? round($satisfied / $total * 100) : 0,
                 'average_rating' => $average,
                 'rating_distribution' => $ratingDistribution,
                 'services_with_reviews' => Service::whereHas('reviews')->count(),

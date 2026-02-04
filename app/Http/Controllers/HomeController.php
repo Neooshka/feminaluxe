@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Domains\Reviews\Models\Review;
 use App\Domains\Services\Models\Service;
 use App\Domains\Services\Services\ServiceCacheService;
 use App\Domains\Services\Services\CategoryService;
@@ -63,11 +64,15 @@ class HomeController extends Controller
 
                 // Получаем все уникальные категории из базы
                 $categories = $this->categoryService->getCategoriesWithCounts();
+                
+                // Отзывы
+                $reviews = Review::with('service')->approved()->where('rating', '>=', 4)->limit(5)->get();
 
                 // Получаем фотки мастера
                 $master = $this->getMasterData();
 
                 return [
+                    'reviews' => $reviews,
                     'services' => $services,
                     'popularServices' => $popularServices,
                     'categories' => $categories,
@@ -77,6 +82,7 @@ class HomeController extends Controller
             function () {
                 // Fallback данные
                 return [
+                    'reviews' => [],
                     'services' => [],
                     'popularServices' => [],
                     'categories' => [],
@@ -108,10 +114,10 @@ class HomeController extends Controller
         return [
             'name' => 'Анна Кузнецова',
             'title' => 'Профессионал с медицинским образованием и многолетним опытом работы',
-            'experience' => 9,
-            'procedures_count' => 2000,
+            'experience' => 5,
+            'procedures_count' => 500,
             'rating' => 5.0,
-            'description' => 'Опыт работы 9 лет. Специализация: пудровые брови, микроблейдинг, акварельные губы, межресничный перманент',
+            'description' => 'Опыт работы 5 лет. Специализация: пудровые брови, микроблейдинг, акварельные губы, межресничный перманент',
             'photos' => $photos,
             'avatar' => $avatar ? Storage::url($avatar) : null,
             'total_photos' => count($photos),

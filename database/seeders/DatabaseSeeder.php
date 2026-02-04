@@ -32,7 +32,7 @@ class DatabaseSeeder extends Seeder
             Booking::factory()->count(5)->create();
 
             // Создаем отзывы
-            Review::factory()->count(5)->create();
+            Review::factory()->count(10)->create();
 
             // Создаем теги
             $tags = Tag::factory()->count(5)->create();

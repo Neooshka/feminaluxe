@@ -29,7 +29,9 @@ const props = defineProps({
     type: Object,
     default: () => ({
       total_reviews: 0,
+      satisfied_reviews: 0,
       average_rating: 0,
+      satisfied_range: 0,
       rating_distribution: {},
       services_with_reviews: 0
     })
@@ -216,7 +218,7 @@ const averageRatingText = computed(() => {
                 <FireIcon class="h-5 w-5 text-orange-500" />
               </div>
               <div class="text-2xl font-bold text-gray-900 mb-1">
-                98%
+                {{ stats.satisfied_range }} %
               </div>
               <div class="text-sm text-gray-600">довольных клиентов</div>
             </div>

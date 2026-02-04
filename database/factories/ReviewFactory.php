@@ -20,7 +20,7 @@ class ReviewFactory extends Factory
     public function definition(): array
     {
         return [
-            'service_id' => fn () => Service::inRandomOrder()->first()?->id ?? Service::factory(),
+            'service_id' => fn () => Service::inRandomOrder()->first()?->id,
             'author' => $this->faker->name(),
             'content' => $this->faker->realText(300),
             'rating' => $this->faker->numberBetween(1, 5),

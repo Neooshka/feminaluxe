@@ -7,6 +7,7 @@ import ServiceCard from '@/Components/ServiceCard.vue';
 import ReviewsTeaser from '@/Components/ReviewsTeaser.vue';
 
 const props = defineProps({
+    reviews: Array,
     services: Array,
     popularServices: Array,
     categories: Array,
@@ -176,9 +177,9 @@ const { props: pageProps } = usePage();
 
 const activeCategory = ref('all');
 const stats = ref([
-    {value: '1000+', label: 'Довольных клиенток', icon: '😊'},
-    {value: '9 лет', label: 'Опыта работы', icon: '⭐'},
-    {value: '96%', label: 'Положительных отзывов', icon: '❤️'},
+    {value: '500+', label: 'Довольных клиенток', icon: '😊'},
+    {value: '5 лет', label: 'Опыта работы', icon: '⭐'},
+    {value: '100%', label: 'Положительных отзывов', icon: '❤️'},
     {value: '100%', label: 'Поддержка клиентов', icon: '📱'},
 ]);
 
@@ -676,7 +677,7 @@ onBeforeUnmount(() => {
         </section>
 
         <!-- Отзывы -->
-        <ReviewsTeaser/>
+        <ReviewsTeaser :reviews="props.reviews" />
 
         <!-- Контакты -->
         <section id="contacts" class="py-16 lg:py-24 bg-gradient-to-br from-rose-50 via-pink-50 to-purple-50">

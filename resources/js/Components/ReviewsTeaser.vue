@@ -1,32 +1,11 @@
 <script setup>
 import { ref } from 'vue';
 
-const reviews = ref([
-  {
-    id: 1,
-    author: 'Анна К.',
-    rating: 5,
-    date: '15.12.2024',
-    content: 'Делала пудровые брови у мастера Марии. Очень довольна результатом! Брови выглядят естественно, цвет идеально подобрали. Процедура практически безболезненная, мастер все подробно объясняла.',
-    service: 'Пудровые брови'
-  },
-  {
-    id: 2,
-    author: 'Елена С.',
-    rating: 5,
-    date: '10.12.2024',
-    content: 'Акварельные губы - это просто волшебство! Цвет нежный, естественный. Уже прошла коррекцию, результат превзошел все ожидания. Спасибо Feminaluxe за профессионализм!',
-    service: 'Акварельные губы'
-  },
-  {
-    id: 3,
-    author: 'Ольга М.',
-    rating: 5,
-    date: '05.12.2024',
-    content: 'Межресничный перманент - мечта любой девушки! Просыпаться с идеальным макияжем - это реальность. Мастер Анастасия - настоящий профессионал, все сделала аккуратно и качественно.',
-    service: 'Межресничный перманент'
-  }
-]);
+const props = defineProps({
+  reviews: Array,
+});
+
+const reviews = ref(props.reviews);
 
 const currentIndex = ref(0);
 
@@ -53,7 +32,7 @@ const prevReview = () => {
           Отзывы наших клиенток
         </h2>
         <p class="text-lg text-gray-600 max-w-2xl mx-auto">
-          Более 1000 довольных клиенток, которые доверили нам свою красоту
+          Более 500 довольных клиенток, которые доверили нам свою красоту
         </p>
       </div>
 
@@ -117,7 +96,7 @@ const prevReview = () => {
                     <span class="absolute -bottom-2 -right-2 text-3xl text-rose-200">"</span>
                   </p>
                   <div class="text-sm text-gray-500">
-                    Услуга: <span class="font-semibold text-rose-600">{{ review.service }}</span>
+                    Услуга: <span class="font-semibold text-rose-600">{{ review.service?.name }}</span>
                   </div>
                 </div>
 
