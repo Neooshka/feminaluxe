@@ -72,7 +72,8 @@ class PostResource extends Resource
                         SpatieMediaLibraryFileUpload::make('featured')
                             ->label('Обложка статьи')
                             ->collection('featured')
-                            ->image()
+
+                                  ->disk('media')                          ->image()
                             ->directory('blog/featured')
                             ->maxSize(10240)
                             ->acceptedFileTypes(['image/jpeg', 'image/png', 'image/webp'])
