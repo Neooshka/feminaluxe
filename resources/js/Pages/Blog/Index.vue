@@ -4,7 +4,7 @@
     <AppLayout>
         <!-- Hero Section -->
         <section class="relative py-20 bg-gradient-to-r from-purple-50 to-pink-50 overflow-hidden">
-            <div class="absolute inset-0 bg-[url('/img/pattern.svg')] opacity-5"></div>
+            <div class="absolute inset-0 bg-[url('/storage/img/blog/pattern.svg')] opacity-5"></div>
             <div class="container mx-auto px-4 relative">
                 <div class="max-w-3xl mx-auto text-center">
                     <h1 class="text-5xl md:text-6xl font-serif font-bold text-gray-900 mb-6">
