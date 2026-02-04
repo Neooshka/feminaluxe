@@ -65,7 +65,7 @@ class PortfolioResource extends Resource
                             Forms\Components\Textarea::make('description')
                                 ->label('Описание')
                                 ->rows(3)
-                                ->maxLength(1000),
+                                ->maxLength(5000),
     
                             Forms\Components\TextInput::make('sort_order')
                                 ->label('Порядок сортировки')
