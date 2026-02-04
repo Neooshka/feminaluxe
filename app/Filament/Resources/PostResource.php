@@ -98,19 +98,27 @@ class PostResource extends Resource
                             }),
                     ]),
 
-                Section::make('SEO')
+                Section::make('SEO Настройки')
                     ->schema([
-                        Forms\Components\Textarea::make('seo.description')
+                        Forms\Components\TextInput::make('seo_title')
+                            ->label('Meta Title')
+                            ->helperText('До 60 символов. Если оставить пустым, будет использован заголовок статьи.')
+                            ->maxLength(60)
+                            ->columnSpanFull(),
+
+                        Forms\Components\Textarea::make('seo_description')
                             ->label('Meta Description')
+                            ->helperText('До 160 символов. Если оставить пустым, будет сгенерирован из содержания.')
                             ->rows(3)
                             ->maxLength(160)
-                            ->helperText('Краткое описание для поисковых систем'),
+                            ->columnSpanFull(),
 
-                        Forms\Components\TextInput::make('seo.title')
-                            ->label('Meta Title')
-                            ->maxLength(60)
-                            ->helperText('Заголовок для SEO (по умолчанию используется заголовок статьи)'),
-                    ]),
+                        Forms\Components\TextInput::make('seo_keywords')
+                            ->label('Ключевые слова')
+                            ->helperText('Через запятую. Например: перманентный макияж, брови, блог, советы')
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+                    ])->collapsed(),
             ]);
     }
 
