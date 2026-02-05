@@ -5,6 +5,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <meta name="robots" content="index, follow" />
+        <meta name="yandex-verification" content="9762190435bcc6ec" />
 
         <!-- Dynamic SEO render -->
         @if (isset($SEOData))
