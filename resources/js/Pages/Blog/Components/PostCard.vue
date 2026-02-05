@@ -38,9 +38,10 @@
             </h3>
 
             <!-- Excerpt -->
-            <p class="text-gray-600 mb-4 line-clamp-3">
-                {{ post.excerpt }}
-            </p>
+          <p
+              class="text-gray-600 mb-4 line-clamp-3"
+              v-html="post.excerpt"
+          ></p>
 
             <!-- Tags -->
             <div v-if="post.tags && post.tags.length > 0" class="flex flex-wrap gap-2 mb-4">

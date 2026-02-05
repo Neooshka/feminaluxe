@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace App\Domains\Blog\Http\Controllers;
 
+use App\Helpers\ContentManager;
 use App\Domains\Blog\Models\Post;
 use App\Domains\Blog\Models\Tag;
 use App\Domains\Blog\Services\BlogSeoService;
 use App\Domains\Reviews\Models\Review;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -88,7 +88,18 @@ class PostController
         }
 
         // Увеличиваем счетчик просмотров (если нужно)
-         $post->increment('views_count');
+        $post->increment('views_count');
+
+        // Следующая и предыдущая статьи
+        $previousPost = Post::published()
+            ->where('published_at', '<', $post->published_at)
+            ->orderBy('published_at', 'desc')
+            ->first();
+
+        $nextPost = Post::published()
+            ->where('published_at', '>', $post->published_at)
+            ->orderBy('published_at', 'asc')
+            ->first();
 
         // Похожие статьи
         $related = Post::published()
@@ -114,7 +125,7 @@ class PostController
             'name' => $tag->name,
             'slug' => $tag->slug,
         ]);
-
+        
         return Inertia::render('Blog/Show', [
             'post' => [
                 'id' => $post->id,
@@ -126,13 +137,17 @@ class PostController
                 'featured_image' => $post->getFirstMediaUrl('featured') ?:
                     '/storage/img/blog/fallback-post.svg',
                 'tags' => $tags,
-                'author' => [
-                    'name' => 'Мастер Feminaluxe',
-                    'avatar' => asset('img/team/default-avatar.svg'),
-                    'bio' => 'Профессиональный мастер перманентного макияжа с 5-летним опытом',
-                ],
+                'author' => ContentManager::getMasterData(),
             ],
             'related' => $related,
+            'previousPost' => $previousPost ? [
+                'title' => $previousPost->title,
+                'slug' => $previousPost->slug,
+            ] : null,
+            'nextPost' => $nextPost ? [
+                'title' => $nextPost->title,
+                'slug' => $nextPost->slug,
+            ] : null,
         ])->withViewData([
             'SEOData' => $post->getDynamicSEOData(),
         ]);
@@ -140,21 +155,80 @@ class PostController
 
     private function cleanContentForExcerpt(string $content): string
     {
-        // 1. Декодируем HTML сущности первого уровня
-        // &lt; становится <, &gt; становится >, &amp; становится &
-        $decoded = html_entity_decode($content, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        return $this->truncateHtml($content, 200);
+    }
 
-        // 2. Теперь удаляем HTML теги (они стали обычными < >)
-        $stripped = strip_tags($decoded);
+    private function truncateHtml(string $html, int $length): string
+    {
+        // Извлекаем параграфы
+        preg_match_all('/<p[^>]*>(.*?)<\/p>/is', $html, $matches);
 
-        // 3. Декодируем еще раз на случай вложенных сущностей
-        $final = html_entity_decode($stripped, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        if (empty($matches[0])) {
+            $plainText = strip_tags($html);
+            $truncated = $this->truncateToWholeWord($plainText, $length);
+            return '<p>' . htmlspecialchars($truncated, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '...</p>';
+        }
 
-        // 4. Убираем лишние пробелы и переносы
-        $clean = preg_replace('/\s+/', ' ', $final);
+        // Берем параграфы пока не наберем нужную длину
+        $result = '';
+        $totalLength = 0;
 
-        // 5. Обрезаем до нужной длины
-        return Str::limit(trim($clean), 200);
+        foreach ($matches[0] as $paragraph) {
+            // Длина текста в параграфе
+            $paragraphText = strip_tags($paragraph);
+            $paragraphLength = mb_strlen($paragraphText);
+
+            // Если добавление этого параграфа превысит лимит
+            if ($totalLength + $paragraphLength > $length) {
+                // Нужно обрезать последний параграф
+                $remainingLength = $length - $totalLength;
+                if ($remainingLength > 0) {
+                    // Извлекаем содержимое параграфа
+                    preg_match('/<p[^>]*>(.*?)<\/p>/is', $paragraph, $contentMatch);
+                    if (!empty($contentMatch[1])) {
+                        // Очищаем текст
+                        $cleanText = strip_tags(html_entity_decode($contentMatch[1], ENT_QUOTES | ENT_HTML5, 'UTF-8'));
+                        // Обрезаем
+                        $truncatedText = $this->truncateToWholeWord($cleanText, $remainingLength);
+                        // Собираем параграф
+                        $result .= '<p>' . htmlspecialchars($truncatedText, ENT_QUOTES | ENT_HTML5, 'UTF-8') . '...</p>';
+                    }
+                }
+                break;
+            }
+
+            // Параграф полностью помещается
+            $result .= $paragraph;
+            $totalLength += $paragraphLength;
+
+            // Если достигли лимита
+            if ($totalLength >= $length) {
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    private function truncateToWholeWord(string $text, int $length): string
+    {
+        if (mb_strlen($text) <= $length) {
+            return $text;
+        }
+
+        $truncated = mb_substr($text, 0, $length);
+
+        // Ищем последний разделитель
+        $pattern = '/[.!?,;:\s]/u';
+        preg_match_all($pattern, $truncated, $matches, PREG_OFFSET_CAPTURE);
+
+        if (!empty($matches[0])) {
+            $lastMatch = end($matches[0]);
+            $lastPos = $lastMatch[1] + mb_strlen($lastMatch[0]);
+            return mb_substr($truncated, 0, $lastPos);
+        }
+
+        return $truncated;
     }
 
     private function calculateReadingTime(string $content): int

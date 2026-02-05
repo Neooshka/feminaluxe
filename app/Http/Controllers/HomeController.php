@@ -8,8 +8,8 @@ use App\Domains\Reviews\Models\Review;
 use App\Domains\Services\Models\Service;
 use App\Domains\Services\Services\ServiceCacheService;
 use App\Domains\Services\Services\CategoryService;
+use App\Helpers\ContentManager;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Storage;
 use Inertia\Inertia;
 use Inertia\Response;
 
@@ -69,7 +69,7 @@ class HomeController extends Controller
                 $reviews = Review::with('service')->approved()->where('rating', '>=', 4)->limit(5)->get();
 
                 // Получаем фотки мастера
-                $master = $this->getMasterData();
+                $master = ContentManager::getMasterData();
 
                 return [
                     'reviews' => $reviews,
@@ -86,41 +86,11 @@ class HomeController extends Controller
                     'services' => [],
                     'popularServices' => [],
                     'categories' => [],
-                    'master' => $this->getMasterData(),
+                    'master' => ContentManager::getMasterData(),
                 ];
             }
         );
 
         return Inertia::render('Home', $data);
-    }
-
-    private function getMasterData(): array
-    {
-        $masterDir = 'masters/anna';
-        $storage = Storage::disk('public');
-
-        // Получаем все фото кроме аватара
-        $allFiles = $storage->files($masterDir);
-        $photos = collect($allFiles)
-            ->filter(fn($file) => !str_contains(basename($file), 'avatar'))
-            ->map(fn($file) => Storage::url($file))
-            ->values()
-            ->toArray();
-
-        // Аватар
-        $avatar = collect($allFiles)
-            ->first(fn($file) => str_contains(basename($file), 'avatar'));
-
-        return [
-            'name' => 'Анна Кузнецова',
-            'title' => 'Профессионал с медицинским образованием и многолетним опытом работы',
-            'experience' => 5,
-            'procedures_count' => 500,
-            'rating' => 5.0,
-            'description' => 'Опыт работы 5 лет. Специализация: пудровые брови, микроблейдинг, акварельные губы, межресничный перманент',
-            'photos' => $photos,
-            'avatar' => $avatar ? Storage::url($avatar) : null,
-            'total_photos' => count($photos),
-        ];
     }
 }

@@ -1,0 +1,120 @@
+@layer components {
+    .article-content {
+        @apply text-gray-800 leading-relaxed;
+        
+        /* Общие отступы */
+        & > * + * {
+            @apply mt-4;
+        }
+        
+        /* Заголовки */
+        h1, h2, h3, h4, h5, h6 {
+            @apply font-serif font-bold text-gray-900 mt-8 mb-4;
+        }
+        
+        h1 {
+            @apply text-4xl;
+        }
+        
+        h2 {
+            @apply text-3xl;
+        }
+        
+        h3 {
+            @apply text-2xl;
+        }
+        
+        h4 {
+            @apply text-xl;
+        }
+        
+        /* Параграфы */
+        p {
+            @apply mb-4 text-justify;
+        }
+        
+        /* Списки */
+        ul, ol {
+            @apply mb-4 ml-6;
+        }
+        
+        ul {
+            @apply list-disc;
+        }
+        
+        ol {
+            @apply list-decimal;
+        }
+        
+        li {
+            @apply mb-2;
+            
+            & > ul, & > ol {
+                @apply mt-2 mb-0;
+            }
+        }
+        
+        /* Цитаты */
+        blockquote {
+            @apply border-l-4 border-pink-300 pl-4 py-2 italic text-gray-600 my-6;
+        }
+        
+        /* Горизонтальные линии */
+        hr {
+            @apply my-8 border-t border-gray-300;
+        }
+        
+        /* Ссылки */
+        a {
+            @apply text-pink-600 hover:text-pink-700 underline transition;
+        }
+        
+        /* Изображения */
+        img {
+            @apply max-w-full h-auto rounded-lg my-6 mx-auto;
+        }
+        
+        /* Таблицы */
+        table {
+            @apply w-full border-collapse my-6;
+        }
+        
+        th, td {
+            @apply border border-gray-300 px-4 py-2;
+        }
+        
+        th {
+            @apply bg-gray-100 font-bold;
+        }
+        
+        /* Код */
+        code {
+            @apply bg-gray-100 px-1 py-0.5 rounded text-sm font-mono;
+        }
+        
+        pre {
+            @apply bg-gray-900 text-gray-100 p-4 rounded-lg overflow-x-auto my-6;
+            
+            code {
+                @apply bg-transparent text-inherit p-0;
+            }
+        }
+        
+        /* Выравнивание */
+        .text-left {
+            @apply text-left;
+        }
+        
+        .text-center {
+            @apply text-center;
+        }
+        
+        .text-right {
+            @apply text-right;
+        }
+        
+        .text-justify {
+            @apply text-justify;
+        }
+    }
+}

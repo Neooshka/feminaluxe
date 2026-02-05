@@ -1,5 +1,6 @@
 /* resources/css/app.css */
 @import "tailwindcss";
+@plugin "@tailwindcss/typography";
 
 /* Custom theme for beauty site */
 :root {
