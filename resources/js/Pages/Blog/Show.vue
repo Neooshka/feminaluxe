@@ -64,7 +64,7 @@
                     <img 
                         :src="post.featured_image" 
                         :alt="post.title"
-                        class="w-full h-auto max-h-[500px] object-cover rounded-2xl shadow-lg"
+                        class="w-full h-auto max-h-[500px] object-contain rounded-2xl shadow-lg"
                         loading="eager"
                     />
                     <p v-if="post.featured_caption" class="text-center text-sm text-gray-500 mt-2">
