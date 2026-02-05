@@ -20,9 +20,10 @@
                     <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
                         {{ article.title }}
                     </h3>
-                    <p class="text-gray-600 text-sm mb-4 line-clamp-2">
-                        {{ article.excerpt }}
-                    </p>
+                    <p 
+                        class="text-gray-600 text-sm mb-4 line-clamp-3"
+                        v-html="article.excerpt"
+                    ></p>
                     <Link 
                         :href="route('blog.show', article.slug)"
                         class="text-pink-600 hover:text-pink-700 font-medium text-sm flex items-center gap-1"
