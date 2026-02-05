@@ -11,7 +11,7 @@
                         Блог о Красоте
                     </h1>
                     <p class="text-xl text-gray-700 mb-8">
-                        Полезные статьи о перманентном макияже, уходе за кожей и трендах 2025 года
+                        Полезные статьи о перманентном макияже, уходе за кожей и трендах {{ currentYear }} года
                     </p>
                     
                     <!-- Search Bar -->
@@ -147,6 +147,8 @@ import AppLayout from '@/Layouts/AppLayout.vue';
 import PostCard from './Components/PostCard.vue';
 import Pagination from '@/Components/Common/Pagination.vue';
 import CTASection from './Components/CTASection.vue';
+
+const currentYear = ref(new Date().getFullYear())
 
 const props = defineProps({
     posts: Object,
