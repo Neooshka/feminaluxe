@@ -14,7 +14,7 @@
                     v-if="article.featured_image"
                     :src="article.featured_image"
                     :alt="article.title"
-                    class="w-full h-48 object-cover"
+                    class="w-full h-48 object-contain"
                 />
                 <div class="p-6">
                     <h3 class="text-lg font-bold text-gray-900 mb-2 line-clamp-2">
