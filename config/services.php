@@ -40,4 +40,12 @@ return [
         'token' => env('TWILIO_TOKEN'),
         'from' => env('TWILIO_FROM'),
     ],
+
+    'yandex' => [
+        'metrika_id' => env('YANDEX_METRIKA_ID'),
+    ],
+    
+    'google' => [
+        'analytics_id' => env('GOOGLE_ANALYTICS_ID'),
+    ]
 ];

@@ -68,21 +68,21 @@ const displayServices = () => {
                 <ShieldCheckIcon class="h-10 w-10 text-green-500" />
               </div>
               <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">100%</div>
-              <div class="text-gray-600">Гипоаллергенные материалы</div>
+              <div class="text-gray-600">Сертифицированные гипоаллергенные пигменты</div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
               <div class="flex items-center justify-center mb-4">
                 <ClockIcon class="h-10 w-10 text-blue-500" />
               </div>
-              <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">3 года</div>
-              <div class="text-gray-600">Гарантия на стойкость</div>
+              <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">до 3 лет</div>
+              <div class="text-gray-600">Результат сохраняется при правильном уходе</div>
             </div>
             <div class="bg-white/80 backdrop-blur-sm rounded-2xl p-6 shadow-lg">
               <div class="flex items-center justify-center mb-4">
                 <SparklesIcon class="h-10 w-10 text-primary" />
               </div>
-              <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">5000+</div>
-              <div class="text-gray-600">Довольных клиенток</div>
+              <div class="text-2xl md:text-3xl font-bold text-gray-900 mb-2">500+</div>
+              <div class="text-gray-600">Реальных работ и довольных клиенток</div>
             </div>
           </div>
         </div>
