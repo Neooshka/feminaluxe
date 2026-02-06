@@ -129,6 +129,7 @@
         <!-- Основной контент -->
         <main>
             <slot/>
+            <CookieNotice />
         </main>
 
         <!-- Футер -->
@@ -244,6 +245,7 @@
 import {Link, usePage} from '@inertiajs/vue3';
 import {ref, computed} from 'vue';
 import {route} from "ziggy-js";
+import CookieNotice from '@/Components/Common/CookieNotice.vue'
 
 const isMenuOpen = ref(false);
 const isScrolled = ref(false);
