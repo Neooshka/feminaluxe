@@ -10,7 +10,7 @@
 - Цена: {{ $booking->service->price }} руб.
 - Статус: {{ $booking->status }}
 
-Если у вас есть вопросы, свяжитесь с нами по email: info@feminaluxe.ru или телефону: +7 (XXX) XXX-XX-XX.
+Если у вас есть вопросы, свяжитесь с нами по email: info@feminaluxe.ru или телефону: +7 (964) 646-89-27.
 
 Спасибо, что выбрали Feminaluxe!
 @endcomponent

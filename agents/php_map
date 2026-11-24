@@ -1,0 +1,14 @@
+$exclude = '\\(vendor|node_modules|\.git|storage|bootstrap\\cache|public\\build)\\'
+$files = Get-ChildItem -Recurse -File | Where-Object { $_.FullName -notmatch $exclude }
+
+$map = foreach ($f in $files) {
+    $rel = [System.IO.Path]::GetRelativePath($PWD, $f.FullName)
+    "=== $rel ==="
+    if ($f.Extension -in '.php', '.js', '.ts', '.vue', '.jsx', '.tsx') {
+        Select-String -Path $f.FullName -Pattern '^\s*(namespace|class|interface|trait|enum|public function|protected function|Route::|export default|function\s+\w+|const\s+\w+\s*=)' |
+            ForEach-Object { "  " + $_.Line.Trim() }
+    }
+}
+
+$map | Set-Clipboard
+Write-Host "Карта проекта скопирована в буфер обмена! Строк: $($map.Count)" -ForegroundColor Green

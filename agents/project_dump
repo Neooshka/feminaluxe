@@ -1,0 +1,47 @@
+$exclude = @( '.git', '.osp', '.idea', 'agents', 'bootstrap\cache', 'node_modules', 'vendor', 'storage', 'tests', 'public' )
+$include = @( '*.php', '*.vue', '*.js', '*.json', '*.md', '*.env.example', '*.yml', '*.yaml', '*.xml', '*.css', '*.scss', '*.ts' )
+
+$root = (Get-Location).Path
+$output = "project-dump.txt"
+$maxLinesPerFile = 2000
+
+$sb = [System.Text.StringBuilder]::new()
+
+Get-ChildItem -Recurse -File -Force | Where-Object {
+    $rel = $_.FullName.Substring($root.Length + 1)
+
+    # Проверка на исключение (по относительному пути)
+    $isExcluded = $false
+    foreach ($ex in $exclude) {
+        if ($rel -eq $ex -or $rel -like "$ex\*") {
+            $isExcluded = $true
+            break
+        }
+    }
+    if ($isExcluded) { return $false }
+
+    # Проверка на include (по имени или расширению)
+    $ext = $_.Extension
+    $name = $_.Name
+    foreach ($inc in $include) {
+        if ($name -like $inc -or $ext -eq $inc.TrimStart('*')) {
+            return $true
+        }
+    }
+    return $false
+} | Sort-Object FullName | ForEach-Object {
+    $rel = $_.FullName.Substring($root.Length + 1)
+    $lines = Get-Content $_.FullName -ErrorAction SilentlyContinue
+    if (-not $lines) { return }
+
+    [void]$sb.AppendLine("`n`n===== FILE: $rel =====")
+
+    if ($lines.Count -gt $maxLinesPerFile) {
+        [void]$sb.AppendLine("[[ОБРЕЗАНО: $($lines.Count) строк, показаны первые $maxLinesPerFile]]")
+        $lines = $lines | Select-Object -First $maxLinesPerFile
+    }
+
+    [void]$sb.AppendLine(($lines -join "`n"))
+}
+
+$sb.ToString() | Out-File -FilePath $output -Encoding UTF8

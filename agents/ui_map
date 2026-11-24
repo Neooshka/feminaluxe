@@ -1,0 +1,30 @@
+$uiPath = "resources\js\Components\UI"
+$files = Get-ChildItem -Path $uiPath -Filter "*.vue" -Recurse
+
+$result = foreach ($file in $files) {
+    $content = Get-Content -Path $file.FullName -Raw
+    $name = $file.BaseName
+    $importPath = "@/Components/UI/$($file.Name)"
+
+    # Достаем имена всех слотов (<slot /> или <slot name="...">)
+    $slots = [regex]::Matches($content, '<slot(?:\s+name=["'']([^"'']+)["''])?') |
+        ForEach-Object { if ($_.Groups[1].Value) { $_.Groups[1].Value } else { "default" } } |
+        Select-Object -Unique
+
+    # Достаем defineProps, defineEmits и defineModel из <script setup>
+    $propsMatch = [regex]::Match($content, '(?s)defineProps\s*\((.*?)\)\s*(?=\r?\n)')
+    $emitsMatch = [regex]::Match($content, 'defineEmits\s*\((.*?)\)')
+    $hasModel   = $content -match 'defineModel'
+
+    "### $name"
+    "Import: import $name from '$importPath'"
+    if ($hasModel) { "v-model: поддерживается (defineModel)" }
+    if ($slots) { "Slots: $($slots -join ', ')" }
+    if ($propsMatch.Success) { "Props: $($propsMatch.Groups[1].Value.Trim() -replace '\s+', ' ')" }
+    if ($emitsMatch.Success) { "Emits: $($emitsMatch.Groups[1].Value.Trim())" }
+    ""
+}
+
+$header = "# UI-компоненты проекта (используй ТОЛЬКО их для верстки страниц, не пиши сырые Tailwind-классы без необходимости)`n`n"
+($header + ($result -join "`n")) | Set-Clipboard
+Write-Host "Карта UI-компонентов ($($files.Count) шт.) скопирована в буфер обмена!" -ForegroundColor Green

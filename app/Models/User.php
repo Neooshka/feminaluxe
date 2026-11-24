@@ -55,12 +55,17 @@ class User extends Authenticatable implements FilamentUser
         return $this->role === 'content';
     }
 
-    public function scopeActive($query)
-    {
-        return $query->where('is_active', true);
-    }
-    
-    public function canAccessPanel(Panel $panel): bool
+	public function scopeActive($query)
+	{
+		return $query->where('is_active', true);
+	}
+
+	public function scopeAdmins($query)
+	{
+		return $query->where('role', 'admin');
+	}
+
+	public function canAccessPanel(Panel $panel): bool
     {
         return in_array($this->role, ['admin', 'manager', 'content']);
     }

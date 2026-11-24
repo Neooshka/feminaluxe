@@ -1,0 +1,13 @@
+$files = Get-ChildItem -Path "resources\js" -Recurse -File
+
+$vueMap = foreach ($f in $files) {
+    $rel = [System.IO.Path]::GetRelativePath($PWD, $f.FullName)
+    "=== $rel ==="
+    if ($f.Extension -in '.vue', '.js', '.ts') {
+        Select-String -Path $f.FullName -Pattern '^\s*(import\s+.*from|defineProps|defineEmits|const\s+\w+\s*=)' |
+            ForEach-Object { "  " + $_.Line.Trim() }
+    }
+}
+
+$vueMap | Set-Clipboard
+Write-Host "Карта Vue-фронтенда скопирована! Строк: $($vueMap.Count)" -ForegroundColor Cyan
